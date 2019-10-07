@@ -21,6 +21,7 @@ private:
     QPushButton* btn_add;
     QPushButton* btn_run;
     QPushButton* btn_remove;
+    QCheckBox*   chbox_editable;
     QListWidget* cmd_registry;
 public:
 
@@ -30,11 +31,12 @@ public:
     {
         form = this->FormLoader::GetForm();
         // Load controls named in the form "user_interface.ui"
-        cmd_input  = form->findChild<QLineEdit*>("cmd_input");
-        btn_add    = form->findChild<QPushButton*>("btn_add");
-        btn_remove = form->findChild<QPushButton*>("btn_remove");
-        btn_run    = form->findChild<QPushButton*>("btn_run");
+        cmd_input    = form->findChild<QLineEdit*>("cmd_input");
+        btn_add      = form->findChild<QPushButton*>("btn_add");
+        btn_remove   = form->findChild<QPushButton*>("btn_remove");
+        btn_run      = form->findChild<QPushButton*>("btn_run");
         cmd_registry = form->findChild<QListWidget*>("cmd_registry");
+        chbox_editable = form->findChild<QCheckBox*>("chbox_editable");
 
         this->setWindowAlwaysOnTop();
         this->load_settings();
@@ -59,10 +61,25 @@ public:
 
         // Signals and slots with lambda function
         QObject::connect(btn_run, &QPushButton::clicked
-                         ,this , &ApplicationLauncher::run_selected_item);
+                         ,[&self = *this]{
+                             self.run_selected_item();
+                         });
 
         QObject::connect(cmd_registry, &QListWidget::doubleClicked
-                         ,this , &ApplicationLauncher::run_selected_item);
+                         ,[&self = *this]
+                         {
+                             if(self.chbox_editable->isChecked())
+                             {
+                                 auto item = self.cmd_registry->currentItem();
+                                 if(item == nullptr) { return; }
+                                 item->setFlags( item->flags() | Qt::ItemIsEditable);
+                                 return;
+                             }
+                             self.run_selected_item();
+                             // auto command = items.first()->text();
+                         });
+
+             //this , &ApplicationLauncher::run_selected_item);
 
 
         QObject::connect(btn_remove, &QPushButton::clicked,
@@ -96,6 +113,21 @@ public:
         std::cout << " [INFO] Run command " << command.toStdString()
                   << " status = " << (status ? "OK" : "FAILURE")
                   << std::endl;
+    }
+
+    // See: https://stackoverflow.com/questions/18934964
+    bool eventFilter(QObject* object, QEvent* event) override
+    {
+        if(object == this->cmd_registry && event->type() == QEvent::KeyRelease)
+        {
+            QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+            if(ke->key() == Qt::Key_Enter || Qt::Key_Return)
+            {
+                std::cout << " [INFO] User pressed Return on QListWidget " << std::endl;
+            }
+            return false;
+        }
+        return false;
     }
 
     /// Make this window stay alwys on top
