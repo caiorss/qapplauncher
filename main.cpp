@@ -58,19 +58,11 @@ public:
         // QObject::connect(btn_remove, &QPushButton::clicked, this, &CustomerForm::Reset);
 
         // Signals and slots with lambda function
-        QObject::connect(btn_run, &QPushButton::clicked,
-                         [&self = *this]
-                         {
-                             auto items = self.cmd_registry->selectedItems();
-                             if(items.isEmpty()) { return; }
-                             auto command = items.first()->text();
+        QObject::connect(btn_run, &QPushButton::clicked
+                         ,this , &ApplicationLauncher::run_selected_item);
 
-                             bool status = QProcess::startDetached(command);
-
-                             std::cout << " [INFO] Run command " << command.toStdString()
-                                       << " status = " << (status ? "OK" : "FAILURE")
-                                       << std::endl;
-                         });
+        QObject::connect(cmd_registry, &QListWidget::doubleClicked
+                         ,this , &ApplicationLauncher::run_selected_item);
 
 
         QObject::connect(btn_remove, &QPushButton::clicked,
@@ -83,11 +75,11 @@ public:
                              self.save_settings();
                          });
 
-
         // Save application state when the main Window is destroyed
-        QObject::connect(this, &QMainWindow::destroyed, []{
-            std::cout << " [INFO] Window closed Ok" << std::endl;
-        });                
+        QObject::connect(this, &QMainWindow::destroyed, []
+                         {
+                             std::cout << " [INFO] Window closed Ok" << std::endl;
+                         });
 
     } // --- End of CustomerForm ctor ------//
 
