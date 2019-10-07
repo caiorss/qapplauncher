@@ -72,7 +72,9 @@ public:
                              {
                                  auto item = self.cmd_registry->currentItem();
                                  if(item == nullptr) { return; }
+                                 // Set item as editable
                                  item->setFlags( item->flags() | Qt::ItemIsEditable);
+                                 self.save_settings();
                                  return;
                              }
                              self.run_selected_item();
