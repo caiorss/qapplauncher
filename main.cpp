@@ -36,6 +36,7 @@ public:
         btn_run    = form->findChild<QPushButton*>("btn_run");
         cmd_registry = form->findChild<QListWidget*>("cmd_registry");
 
+        this->setWindowAlwaysOnTop();
         this->load_settings();
 
         // ========== Set Event Handlers =================//
@@ -89,6 +90,12 @@ public:
         });                
 
     } // --- End of CustomerForm ctor ------//
+
+    /// Make this window stay alwys on top
+    void setWindowAlwaysOnTop()
+    {
+        this->setWindowFlag(Qt::WindowStaysOnTopHint);
+    }
 
     QString
     get_settings_file()
