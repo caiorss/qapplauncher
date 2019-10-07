@@ -104,7 +104,11 @@ public:
 
     void load_settings()
     {
-        QString settings_file = "/tmp/settings.conf";
+        QString settings_file = this->get_settings_file();
+
+        // Abort if setting files does not exist
+        if(!QFile(settings_file).exists()){ return; }
+
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         auto commands = settings.value("commands/list").toStringList();
         for(auto const& cmd: commands){
@@ -115,10 +119,7 @@ public:
 
     void save_settings()
     {
-        QString settings_file = "/tmp/settings.conf";
-
-        // Abort if setting files does not exist
-        if(!QFile(settings_file).exists()){ return; }
+        auto settings_file = this->get_settings_file();
 
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         QStringList list;
@@ -128,6 +129,7 @@ public:
             list << item->text();
         }
         settings.setValue("commands/list", list);
+        settings.sync();
     }
 
 
