@@ -36,6 +36,7 @@ public:
         btn_run    = form->findChild<QPushButton*>("btn_run");
         cmd_registry = form->findChild<QListWidget*>("cmd_registry");
 
+        this->load_settings();
 
         // ========== Set Event Handlers =================//
 
@@ -49,6 +50,7 @@ public:
                              item->setText(text);
                              self.cmd_registry->insertItem(0, item);
                              self.cmd_input->clear();
+                             self.save_settings();
                          });
 
         // Signals and slots with member function pointer
@@ -77,6 +79,7 @@ public:
                              if(pItem == nullptr) { return; }
                              self.cmd_registry->removeItemWidget(pItem);
                              delete pItem;
+                             self.save_settings();
                          });
 
 
@@ -86,6 +89,34 @@ public:
         });                
 
     } // --- End of CustomerForm ctor ------//
+
+    void load_settings()
+    {
+        QString settings_file = "/tmp/settings.conf";
+        auto settings = QSettings(settings_file, QSettings::IniFormat);
+        auto commands = settings.value("commands/list").toStringList();
+        for(auto const& cmd: commands){
+            this->cmd_registry->addItem(cmd);
+        }
+        std::cout << " [INFO] Settings loaded Ok." << std::endl;
+    }
+
+    void save_settings()
+    {
+        QString settings_file = "/tmp/settings.conf";
+
+        // Abort if setting files does not exist
+        if(!QFile(settings_file).exists()){ return; }
+
+        auto settings = QSettings(settings_file, QSettings::IniFormat);
+        QStringList list;
+        for(int i = 0; i < this->cmd_registry->count(); i++)
+        {
+            QListWidgetItem* item = this->cmd_registry->item(i);
+            list << item->text();
+        }
+        settings.setValue("commands/list", list);
+    }
 
 
 };
