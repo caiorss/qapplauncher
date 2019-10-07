@@ -91,6 +91,21 @@ public:
 
     } // --- End of CustomerForm ctor ------//
 
+    // Run item selected in the QListWidget
+    void run_selected_item()
+    {
+        auto& self = *this;
+        auto items = self.cmd_registry->selectedItems();
+        if(items.isEmpty()) { return; }
+        auto command = items.first()->text();
+
+        bool status = QProcess::startDetached(command);
+
+        std::cout << " [INFO] Run command " << command.toStdString()
+                  << " status = " << (status ? "OK" : "FAILURE")
+                  << std::endl;
+    }
+
     /// Make this window stay alwys on top
     void setWindowAlwaysOnTop()
     {
