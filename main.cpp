@@ -21,7 +21,8 @@ private:
     QPushButton* btn_add;
     QPushButton* btn_run;
     QPushButton* btn_remove;
-    QCheckBox*   chbox_editable;
+    QCheckBox*   chb_editable;
+    QCheckBox*   chb_always_on_top;
     QListWidget* cmd_registry;
 public:
 
@@ -36,12 +37,31 @@ public:
         btn_remove   = form->findChild<QPushButton*>("btn_remove");
         btn_run      = form->findChild<QPushButton*>("btn_run");
         cmd_registry = form->findChild<QListWidget*>("cmd_registry");
-        chbox_editable = form->findChild<QCheckBox*>("chbox_editable");
+        chb_editable = form->findChild<QCheckBox*>("chb_editable");
+        chb_always_on_top = form->findChild<QCheckBox*>("chb_always_on_top");
 
-        this->setWindowAlwaysOnTop();
+        // this->setWindowAlwaysOnTop();
         this->load_settings();
 
         // ========== Set Event Handlers =================//
+
+
+        // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
+        QObject::connect(chb_always_on_top, &QCheckBox::clicked,
+                         [&self = *this]
+                         {
+                             #if 1
+                             QMessageBox::warning( &self
+                                                  , "Error report"
+                                                  , "Functionality not implemented yet."
+                                                  );
+                             #endif
+                             // static auto flags = self.windowFlags();
+                             // flags ^=  Qt::WindowStaysOnTopHint;
+                             // self.show();
+                             // self.activateWindow();
+                         });
+
 
         // Signals and slots with lambda function
         QObject::connect(btn_add, &QPushButton::clicked,
@@ -68,7 +88,7 @@ public:
         QObject::connect(cmd_registry, &QListWidget::doubleClicked
                          ,[&self = *this]
                          {
-                             if(self.chbox_editable->isChecked())
+                             if(self.chb_editable->isChecked())
                              {
                                  auto item = self.cmd_registry->currentItem();
                                  if(item == nullptr) { return; }
@@ -135,7 +155,7 @@ public:
     /// Make this window stay alwys on top
     void setWindowAlwaysOnTop()
     {
-        this->setWindowFlag(Qt::WindowStaysOnTopHint);
+        this->setWindowFlags(Qt::WindowStaysOnTopHint);
     }
 
     QString
