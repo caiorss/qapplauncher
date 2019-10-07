@@ -12,7 +12,7 @@
 
 #include "FormLoader.hpp"
 
-class CustomerForm: public FormLoader
+class ApplicationLauncher: public FormLoader
 {
 private:
     QWidget*     form;
@@ -25,7 +25,7 @@ private:
 public:
 
 
-    CustomerForm()
+    ApplicationLauncher()
         : FormLoader(":/assets/user_interface.ui")
     {
         form = this->FormLoader::GetForm();
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
     std::cout << " [INFO] QTVersion = " << ::qVersion() << std::endl;
 
 
-    CustomerForm form;
+    ApplicationLauncher form;
     form.setWindowIcon(QIcon(":/images/appicon.png"));
     form.showNormal();
 
