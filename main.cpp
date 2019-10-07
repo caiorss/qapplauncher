@@ -90,6 +90,18 @@ public:
 
     } // --- End of CustomerForm ctor ------//
 
+    QString
+    get_settings_file()
+    {
+        // On Linux, the typical location of the setting file is:
+        //   /home/<USER>/.config/<ApplicationName>.qconf
+        QString settings_file = QStandardPaths::standardLocations(QStandardPaths::ConfigLocation).at(0)
+                                + "/" + qApp->applicationName() + ".qconf";
+        std::cout << " [INFO] Settings file = " << settings_file.toStdString() << std::endl;
+        return settings_file;
+
+    }
+
     void load_settings()
     {
         QString settings_file = "/tmp/settings.conf";
