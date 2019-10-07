@@ -129,11 +129,6 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setApplicationName("qapplauncher");
 
-    std::cout << " [INFO] Starting Application" << std::endl;
-
-    // Useful for debugging
-    std::cout << " [INFO] QTVersion = " << ::qVersion() << std::endl;
-
 
     ApplicationLauncher form;
     form.setWindowIcon(QIcon(":/images/appicon.png"));
