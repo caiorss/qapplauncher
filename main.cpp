@@ -149,19 +149,24 @@ public:
                              self.save_settings();
                          });
 
-        QObject::connect(btn_open_file, &QPushButton::clicked,
-                         [&self = *this]
-                         {
-                             QListWidgetItem* pItem= self.tview_disp->currentItem();
-                             // Abort on error
-                             if(!pItem){ return; }
-                             auto file = pItem->text();
-                             std::cout << " [INFO] Open file " << file.toStdString() << "\n";
-                             auto args = QList<QString>{file};
-                             // Linux-only for a while
-                             bool status = QProcess::startDetached("xdg-open", args);
-                         });
+        auto open_selected_bookmark_file = [&self = *this]
+        {
+            QListWidgetItem* pItem= self.tview_disp->currentItem();
+            // Abort on error
+            if(!pItem){ return; }
+            auto file = pItem->text();
+            std::cout << " [INFO] Open file " << file.toStdString() << "\n";
+            auto args = QList<QString>{file};
+            // Linux-only for a while
+            bool status = QProcess::startDetached("xdg-open", args);
+        };
 
+        QObject::connect(btn_open_file, &QPushButton::clicked
+                         , open_selected_bookmark_file);
+
+
+        QObject::connect(tview_disp, &QTableWidget::doubleClicked
+                         , open_selected_bookmark_file);
 
 
     } // --- End of CustomerForm ctor ------//
