@@ -28,6 +28,7 @@ private:
     //======= Tab - Desktop Capture - Widgets =======//
     QPushButton* btn_add_file;
     QPushButton* btn_open_file;
+    QPushButton* btn_remove_file;
     QListWidget* tview_disp;
 public:
 
@@ -52,6 +53,7 @@ public:
 
         btn_add_file = form->findChild<QPushButton*>("btn_add_file");
         btn_open_file = form->findChild<QPushButton*>("btn_open_file");
+        btn_remove_file = form->findChild<QPushButton*>("btn_remove_file");
 
         tview_disp = form->findChild<QListWidget*>("tview_disp");
         assert(tview_disp != nullptr);
@@ -164,9 +166,18 @@ public:
         QObject::connect(btn_open_file, &QPushButton::clicked
                          , open_selected_bookmark_file);
 
-
         QObject::connect(tview_disp, &QTableWidget::doubleClicked
                          , open_selected_bookmark_file);
+
+        QObject::connect(btn_remove_file, &QPushButton::clicked
+                         , [&self = *this]
+                         {
+                             QListWidgetItem* pItem = self.tview_disp->currentItem();
+                             if(pItem == nullptr) { return; }
+                             self.cmd_registry->removeItemWidget(pItem);
+                             delete pItem;
+                             self.save_settings();
+                         });
 
 
     } // --- End of CustomerForm ctor ------//
