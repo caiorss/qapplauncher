@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
+    <width>757</width>
     <height>552</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>521</width>
+      <y>20</y>
+      <width>711</width>
       <height>511</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -163,10 +163,164 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="tab_file_bookmark">
      <attribute name="title">
       <string>Desktop Capture</string>
      </attribute>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>400</y>
+        <width>461</width>
+        <height>61</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>380</y>
+        <width>171</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File/Directory Information</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>20</y>
+        <width>141</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File/Directory registry</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="entry_filetitle">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>270</y>
+        <width>351</width>
+        <height>23</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>270</y>
+        <width>59</width>
+        <height>15</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Title</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>300</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Description</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="entry_filedesc">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>300</y>
+        <width>351</width>
+        <height>23</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_add_file">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>340</y>
+        <width>80</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_open_file">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>340</y>
+        <width>80</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Open</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_remove_file">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>340</y>
+        <width>80</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="entry_filename">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>240</y>
+        <width>351</width>
+        <height>23</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>240</y>
+        <width>59</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="tview_disp">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>60</y>
+        <width>651</width>
+        <height>151</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -175,7 +329,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>541</width>
+     <width>757</width>
      <height>20</height>
     </rect>
    </property>
