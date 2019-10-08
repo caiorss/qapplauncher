@@ -136,6 +136,33 @@ public:
                              std::cout << " [INFO] Window closed Ok" << std::endl;
                          });
 
+        // =========== Event Handlers of Bookmark Table =========//
+
+        QObject::connect(btn_add_file, &QPushButton::clicked,
+                         [&self = *this]
+                         {
+                             QString file = QFileDialog::getOpenFileName(
+                                 &self, "Open File", ".");
+                             std::cout << " [INFO] Selected file = "
+                                       << file.toStdString() << std::endl;
+                             self.tview_disp->addItem(file);
+                         });
+
+        QObject::connect(btn_open_file, &QPushButton::clicked,
+                         [&self = *this]
+                         {
+                             QListWidgetItem* pItem= self.tview_disp->currentItem();
+                             // Abort on error
+                             if(!pItem){ return; }
+                             auto file = pItem->text();
+                             std::cout << " [INFO] Open file " << file.toStdString() << "\n";
+                             auto args = QList<QString>{file};
+                             // Linux-only for a while
+                             bool status = QProcess::startDetached("xdg-open", args);
+                         });
+
+
+
     } // --- End of CustomerForm ctor ------//
 
     // Run item selected in the QListWidget
@@ -226,7 +253,6 @@ int main(int argc, char** argv)
 
     QApplication app(argc, argv);
     app.setApplicationName("qapplauncher");
-
 
     ApplicationLauncher form;
     form.setWindowIcon(QIcon(":/images/appicon.png"));
