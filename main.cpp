@@ -146,6 +146,7 @@ public:
                              std::cout << " [INFO] Selected file = "
                                        << file.toStdString() << std::endl;
                              self.tview_disp->addItem(file);
+                             self.save_settings();
                          });
 
         QObject::connect(btn_open_file, &QPushButton::clicked,
@@ -225,6 +226,14 @@ public:
         for(auto const& cmd: commands){
             this->cmd_registry->addItem(cmd);
         }
+
+        auto files_bookmarks = settings.value("files_bookmarks/list")
+                                   .toStringList();
+
+        for(auto const& file: files_bookmarks){
+            this->tview_disp->addItem(file);
+        }
+
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
     }
 
@@ -233,6 +242,7 @@ public:
         auto settings_file = this->get_settings_file();
 
         auto settings = QSettings(settings_file, QSettings::IniFormat);
+
         QStringList list;
         for(int i = 0; i < this->cmd_registry->count(); i++)
         {
@@ -240,6 +250,14 @@ public:
             list << item->text();
         }
         settings.setValue("commands/list", list);
+
+        QStringList file_bookmarks;
+        for(int i = 0; i < this->tview_disp->count(); i++)
+        {
+            file_bookmarks << this->tview_disp->item(i)->text();
+        }
+        settings.setValue("files_bookmarks/list", file_bookmarks);
+
         settings.sync();
     }
 
@@ -252,7 +270,7 @@ int main(int argc, char** argv)
     std::cout << " [INFO] Starting Application" << std::endl;
 
     QApplication app(argc, argv);
-    app.setApplicationName("qapplauncher");
+    app.setApplicationName("qapplauncher");   
 
     ApplicationLauncher form;
     form.setWindowIcon(QIcon(":/images/appicon.png"));
