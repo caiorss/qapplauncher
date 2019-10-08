@@ -24,6 +24,11 @@ private:
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
     QListWidget* cmd_registry;
+
+    //======= Tab - Desktop Capture - Widgets =======//
+    QPushButton* btn_add_file;
+    QPushButton* btn_open_file;
+    QListWidget* tview_disp;
 public:
 
 
@@ -31,6 +36,9 @@ public:
         : FormLoader(":/assets/user_interface.ui")
     {
         form = this->FormLoader::GetForm();
+
+        //========= Tab - Application Launcher ==============///
+
         // Load controls named in the form "user_interface.ui"
         cmd_input    = form->findChild<QLineEdit*>("cmd_input");
         btn_add      = form->findChild<QPushButton*>("btn_add");
@@ -39,6 +47,14 @@ public:
         cmd_registry = form->findChild<QListWidget*>("cmd_registry");
         chb_editable = form->findChild<QCheckBox*>("chb_editable");
         chb_always_on_top = form->findChild<QCheckBox*>("chb_always_on_top");
+
+        //========= Tab - Desktop Capture =================//
+
+        btn_add_file = form->findChild<QPushButton*>("btn_add_file");
+        btn_open_file = form->findChild<QPushButton*>("btn_open_file");
+
+        tview_disp = form->findChild<QListWidget*>("tview_disp");
+        assert(tview_disp != nullptr);
 
         // this->setWindowAlwaysOnTop();
         this->load_settings();
