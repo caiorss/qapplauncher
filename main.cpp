@@ -33,10 +33,12 @@ namespace qtutils
     make_tray_icon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
     {
         auto tray = new QSystemTrayIcon(wnd);
-        tray->setToolTip(tooltip);
         auto appIcon = QIcon(icon_path);
         assert(!appIcon.isNull());
+
         wnd->setWindowIcon(appIcon);
+        tray->setIcon(appIcon);
+        tray->setToolTip(tooltip);
         tray->show();
         return tray;
     }
