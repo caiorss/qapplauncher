@@ -36,7 +36,7 @@ namespace qtutils
 
     /** Creates a tray icon that toggles main window visiblity when clicked. */
     QSystemTrayIcon*
-    make_window_toggle_tray_icon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
+    make_window_toggle_trayicon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
     {
         auto tray = new QSystemTrayIcon(wnd);
         auto appIcon = QIcon(icon_path);
@@ -239,7 +239,7 @@ public:
 
     } // --- End of CustomerForm ctor ------//
 
-    // Run item selected in the QListWidget
+    // Run item selected in the QListWidget (ApplicationRegistry)
     void run_selected_item()
     {
         auto& self = *this;
@@ -346,7 +346,14 @@ public:
             std::cout << "Drag Event" << std::endl;
             if(!mimeData->hasUrls())
                 return;
-            QString path = mimeData->urls()[0].toLocalFile();
+            auto url = mimeData->urls()[0];
+            QString path;
+
+            if(url.isLocalFile())
+                path = mimeData->urls()[0].toLocalFile();
+            else
+                path = mimeData->urls()[0].toString();
+
             std::cout << " [TRACE] Dragged file: " << path.toStdString() << "\n";
             this->tview_disp->addItem(path);
             this->save_settings();
