@@ -7,6 +7,8 @@
 #include <QSysInfo>
 #include <QtConcurrent/QtConcurrent>
 
+#include <string>
+
 /**
   * Class FormLoader is a helper for loading QtWidgets dynamically
   * from a Form without compilation. */
@@ -63,7 +65,12 @@ public:
     void on_clicked(QString widget_name, Callback&& event_handler)
     {
         Sender* pSender = form->findChild<Sender*>(widget_name);
-        assert(pSender != nullptr);
+        if(pSender == nullptr){
+            using namespace std::string_literals;
+            throw std::runtime_error("Error: Unable to load widget named: <"s
+                                     + widget_name.toStdString()
+                                     + "> from the form file "s + formFile.toStdString());
+        }
         QObject::connect(pSender, &Sender::clicked, event_handler);
     }
 
