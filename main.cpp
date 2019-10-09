@@ -85,72 +85,64 @@ public:
 
 
         // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
-        QObject::connect(chb_always_on_top, &QCheckBox::clicked,
-                         [&self = *this]
-                         {
-                             #if 1
-                             QMessageBox::warning( &self
-                                                  , "Error report"
-                                                  , "Functionality not implemented yet."
-                                                  );
-                             #endif
-                             // static auto flags = self.windowFlags();
-                             // flags ^=  Qt::WindowStaysOnTopHint;
-                             // self.show();
-                             // self.activateWindow();
-                         });
+        qtutils::on_clicked(chb_always_on_top,
+                            [&self = *this]
+                            {
+                              #if 1
+                                QMessageBox::warning( &self
+                                                     , "Error report"
+                                                     , "Functionality not implemented yet."
+                                                     );
+                                #endif
+                                // static auto flags = self.windowFlags();
+                                // flags ^=  Qt::WindowStaysOnTopHint;
+                                // self.show();
+                                // self.activateWindow();
+                            });
 
-
-        // Signals and slots with lambda function
-        QObject::connect(btn_add, &QPushButton::clicked,
-                         [&self = *this]
-                         {                             
+        qtutils::on_clicked(btn_add,[&self = *this]
+                            {
                              auto text = self.cmd_input->text();
-                             if(text.isEmpty()) { return; }
-                             auto item = new QListWidgetItem();
-                             item->setText(text);
-                             self.cmd_registry->insertItem(0, item);
-                             self.cmd_input->clear();
-                             self.save_settings();
-                         });
+                                if(text.isEmpty()) { return; }
+                                auto item = new QListWidgetItem();
+                                item->setText(text);
+                                self.cmd_registry->insertItem(0, item);
+                                self.cmd_input->clear();
+                                self.save_settings();
+                            });
 
         // Signals and slots with member function pointer
         // QObject::connect(btn_remove, &QPushButton::clicked, this, &CustomerForm::Reset);
 
         // Signals and slots with lambda function
-        QObject::connect(btn_run, &QPushButton::clicked
-                         ,[&self = *this]{
-                             self.run_selected_item();
-                         });
-
-        QObject::connect(cmd_registry, &QListWidget::doubleClicked
-                         ,[&self = *this]
-                         {
-                             if(self.chb_editable->isChecked())
-                             {
-                                 auto item = self.cmd_registry->currentItem();
-                                 if(item == nullptr) { return; }
-                                 // Set item as editable
-                                 item->setFlags( item->flags() | Qt::ItemIsEditable);
-                                 self.save_settings();
-                                 return;
-                             }
-                             self.run_selected_item();
-                             // auto command = items.first()->text();
-                         });
-
-             //this , &ApplicationLauncher::run_selected_item);
+        qtutils::on_clicked(btn_run, [self = this]{ self->run_selected_item(); });
 
 
-        QObject::connect(btn_remove, &QPushButton::clicked,
-                         [&self = *this]
-                         {
-                             QListWidgetItem* pItem = self.cmd_registry->currentItem();
-                             if(pItem == nullptr) { return; }
-                             self.cmd_registry->removeItemWidget(pItem);
-                             delete pItem;
-                             self.save_settings();
-                         });
+        qtutils::on_double_clicked(cmd_registry, [&self = *this]
+                                   {
+                                       if(self.chb_editable->isChecked())
+                                       {
+                                           auto item = self.cmd_registry->currentItem();
+                                           if(item == nullptr) { return; }
+                                           // Set item as editable
+                                           item->setFlags( item->flags() | Qt::ItemIsEditable);
+                                           self.save_settings();
+                                           return;
+                                       }
+                                       self.run_selected_item();
+                                       // auto command = items.first()->text();
+                                   });
+
+        qtutils::on_clicked(btn_remove,
+                            [&self = *this]
+                            {
+                                QListWidgetItem* pItem = self.cmd_registry->currentItem();
+                                if(pItem == nullptr) { return; }
+                                self.cmd_registry->removeItemWidget(pItem);
+                                delete pItem;
+                                self.save_settings();
+                            });
+
 
         // Save application state when the main Window is destroyed
         QObject::connect(this, &QMainWindow::destroyed, []
@@ -160,16 +152,16 @@ public:
 
         // =========== Event Handlers of Bookmark Table =========//
 
-        QObject::connect(btn_add_file, &QPushButton::clicked,
-                         [&self = *this]
-                         {
-                             QString file = QFileDialog::getOpenFileName(
-                                 &self, "Open File", ".");
-                             std::cout << " [INFO] Selected file = "
-                                       << file.toStdString() << std::endl;
-                             self.tview_disp->addItem(file);
-                             self.save_settings();
-                         });
+        qtutils::on_clicked(btn_add_file,
+                            [&self = *this]
+                            {
+                                QString file = QFileDialog::getOpenFileName(
+                                    &self, "Open File", ".");
+                                std::cout << " [INFO] Selected file = "
+                                          << file.toStdString() << std::endl;
+                                self.tview_disp->addItem(file);
+                                self.save_settings();
+                            });
 
         auto open_selected_bookmark_file = [&self = *this]
         {
@@ -183,22 +175,18 @@ public:
             bool status = QProcess::startDetached("xdg-open", args);
         };
 
-        QObject::connect(btn_open_file, &QPushButton::clicked
-                         , open_selected_bookmark_file);
+        qtutils::on_clicked(btn_open_file, open_selected_bookmark_file);
+        qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
 
-        QObject::connect(tview_disp, &QTableWidget::doubleClicked
-                         , open_selected_bookmark_file);
-
-        QObject::connect(btn_remove_file, &QPushButton::clicked
-                         , [&self = *this]
-                         {
-                             QListWidgetItem* pItem = self.tview_disp->currentItem();
-                             if(pItem == nullptr) { return; }
-                             self.cmd_registry->removeItemWidget(pItem);
-                             delete pItem;
-                             self.save_settings();
-                         });
-
+        qtutils::on_clicked(btn_remove_file,
+                            [&self = *this]
+                            {
+                                QListWidgetItem* pItem = self.tview_disp->currentItem();
+                                if(pItem == nullptr) { return; }
+                                self.cmd_registry->removeItemWidget(pItem);
+                                delete pItem;
+                                self.save_settings();
+                            });
 
     } // --- End of CustomerForm ctor ------//
 
@@ -308,9 +296,9 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setApplicationName("qapplauncher");   
 
-    ApplicationLauncher form;
-    form.setWindowIcon(QIcon(":/images/appicon.png"));
-    form.showNormal();
+    ApplicationLauncher maingui;
+    maingui.setWindowIcon(QIcon(":/assets/appicon.png"));
+    maingui.showNormal();
 
 
     return app.exec();
