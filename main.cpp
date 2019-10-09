@@ -43,24 +43,19 @@ namespace qtutils
 }
 
 
-class ApplicationLauncher: public FormLoader
+class ApplicationLauncher: public QMainWindow
 {
 private:
+    FormLoader   loader;
     QWidget*     form;
     // Extract children widgets from from file
     QLineEdit*   cmd_input;
-    QPushButton* btn_add;
-    QPushButton* btn_run;
-    QPushButton* btn_remove;
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
     QListWidget* cmd_registry;
 
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
-    QPushButton* btn_add_file;
-    QPushButton* btn_open_file;
-    QPushButton* btn_remove_file;
     QListWidget* tview_disp;
 
     //======== TrayIcon =============================//
@@ -70,9 +65,10 @@ public:
 
 
     ApplicationLauncher()
-        : FormLoader(":/assets/user_interface.ui")
+        : loader{FormLoader(this, ":/assets/user_interface.ui")}
     {
-        form = this->FormLoader::GetForm();
+
+        form = loader.GetForm();
 
         // Do not quit when user clicks at close button
         this->setAttribute(Qt::WA_QuitOnClose, false);
@@ -80,21 +76,14 @@ public:
         //========= Tab - Application Launcher ==============///
 
         // Load controls named in the form "user_interface.ui"
-        cmd_input    = form->findChild<QLineEdit*>("cmd_input");
-        btn_add      = form->findChild<QPushButton*>("btn_add");
-        btn_remove   = form->findChild<QPushButton*>("btn_remove");
-        btn_run      = form->findChild<QPushButton*>("btn_run");
-        cmd_registry = form->findChild<QListWidget*>("cmd_registry");
-        chb_editable = form->findChild<QCheckBox*>("chb_editable");
-        chb_always_on_top = form->findChild<QCheckBox*>("chb_always_on_top");
+        cmd_input         = loader.find_child<QLineEdit>("cmd_input");
+        cmd_registry      = loader.find_child<QListWidget>("cmd_registry");
+        chb_editable      = loader.find_child<QCheckBox>("chb_editable");
+        chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
 
         //========= Tab - Desktop Capture =================//
-        tab_file_bookmarks = form->findChild<QWidget*>("tab_file_bookmarks");
-        btn_add_file = form->findChild<QPushButton*>("btn_add_file");
-        btn_open_file = form->findChild<QPushButton*>("btn_open_file");
-        btn_remove_file = form->findChild<QPushButton*>("btn_remove_file");
-
-        tview_disp = form->findChild<QListWidget*>("tview_disp");
+        tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
+        tview_disp = loader.find_child<QListWidget>("tview_disp");
         assert(tview_disp != nullptr);
 
         //========= Create Tray Icon =======================//
@@ -117,42 +106,41 @@ public:
         this->setAcceptDrops(true);
         // tab_file_bookmarks->setAcceptDrops(true);
         // tview_disp->setAcceptDrops(true);
-        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");
-
-        btn_add_file->setAcceptDrops(true);
+        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");       
 
         // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
-        qtutils::on_clicked(chb_always_on_top,
-                            [&self = *this]
-                            {
-                              #if 1
-                                QMessageBox::warning( &self
-                                                     , "Error report"
-                                                     , "Functionality not implemented yet."
-                                                     );
+        loader.on_clicked<QCheckBox>("chb_always_on_top",
+                                     [&self = *this]
+                                     {
+                                #if 1
+                                         QMessageBox::warning( &self
+                                                              , "Error report"
+                                                              , "Functionality not implemented yet."
+                                                              );
                                 #endif
                                 // static auto flags = self.windowFlags();
                                 // flags ^=  Qt::WindowStaysOnTopHint;
                                 // self.show();
                                 // self.activateWindow();
-                            });
+                                 });
 
-        qtutils::on_clicked(btn_add,[&self = *this]
-                            {
-                             auto text = self.cmd_input->text();
-                                if(text.isEmpty()) { return; }
-                                auto item = new QListWidgetItem();
-                                item->setText(text);
-                                self.cmd_registry->insertItem(0, item);
-                                self.cmd_input->clear();
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_add", [&self = *this]
+                                 {
+                                     auto text = self.cmd_input->text();
+                                     if(text.isEmpty()) { return; }
+                                     auto item = new QListWidgetItem();
+                                     item->setText(text);
+                                     self.cmd_registry->insertItem(0, item);
+                                     self.cmd_input->clear();
+                                     self.save_settings();
+                                 });
+        // qtutils::on_clicked(btn_add,);
 
         // Signals and slots with member function pointer
         // QObject::connect(btn_remove, &QPushButton::clicked, this, &CustomerForm::Reset);
 
         // Signals and slots with lambda function
-        qtutils::on_clicked(btn_run, [self = this]{ self->run_selected_item(); });
+        loader.on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
 
 
         qtutils::on_double_clicked(cmd_registry, [&self = *this]
@@ -170,15 +158,15 @@ public:
                                        // auto command = items.first()->text();
                                    });
 
-        qtutils::on_clicked(btn_remove,
-                            [&self = *this]
-                            {
-                                QListWidgetItem* pItem = self.cmd_registry->currentItem();
-                                if(pItem == nullptr) { return; }
-                                self.cmd_registry->removeItemWidget(pItem);
-                                delete pItem;
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_remove",
+                                 [&self = *this]
+                                 {
+                                     QListWidgetItem* pItem = self.cmd_registry->currentItem();
+                                     if(pItem == nullptr) { return; }
+                                     self.cmd_registry->removeItemWidget(pItem);
+                                     delete pItem;
+                                     self.save_settings();
+                                 });
 
 
         // Save application state when the main Window is destroyed
@@ -189,16 +177,16 @@ public:
 
         // =========== Event Handlers of Bookmark Table =========//
 
-        qtutils::on_clicked(btn_add_file,
-                            [&self = *this]
-                            {
-                                QString file = QFileDialog::getOpenFileName(
-                                    &self, "Open File", ".");
-                                std::cout << " [INFO] Selected file = "
-                                          << file.toStdString() << std::endl;
-                                self.tview_disp->addItem(file);
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_add_file",
+                                 [&self = *this]
+                                 {
+                                     QString file = QFileDialog::getOpenFileName(
+                                         &self, "Open File", ".");
+                                     std::cout << " [INFO] Selected file = "
+                                               << file.toStdString() << std::endl;
+                                     self.tview_disp->addItem(file);
+                                     self.save_settings();
+                                 });
 
         auto open_selected_bookmark_file = [&self = *this]
         {
@@ -211,10 +199,10 @@ public:
             QDesktopServices::openUrl(QUrl("file://" + file, QUrl::TolerantMode));
         };
 
-        qtutils::on_clicked(btn_open_file, open_selected_bookmark_file);
+        loader.on_button_clicked("btn_open_file", open_selected_bookmark_file);
         qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
 
-        qtutils::on_clicked(btn_remove_file,
+        loader.on_button_clicked("btn_remove_file",
                             [&self = *this]
                             {
                                 QListWidgetItem* pItem = self.tview_disp->currentItem();

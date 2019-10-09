@@ -9,3 +9,5 @@
 *.dylib
 *.tgz
 *.tar.gz
+build/*
+bin/*

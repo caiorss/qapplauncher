@@ -7,30 +7,35 @@
 #include <QSysInfo>
 #include <QtConcurrent/QtConcurrent>
 
+#include <string>
+
 /**
   * Class FormLoader is a helper for loading QtWidgets dynamically
   * from a Form without compilation. */
-class FormLoader: public QMainWindow
+class FormLoader
 {
 private:
     QString  formFile;
     QWidget* form;
+    QWidget* m_parent;
 public:
-    FormLoader(QString path)
+    FormLoader(QMainWindow* parent, QString path)
     {
+        m_parent = parent;
+
         this->LoadForm(path);
-        this->setCentralWidget(form);
-        this->setWindowTitle(form->windowTitle());
+        parent->setCentralWidget(form);
+        parent->setWindowTitle(form->windowTitle());
 
         // Set Width and height
-        this->resize(form->width(), form->height());
+        parent->resize(form->width(), form->height());
 
         // Center Window in the screen
-        this->setGeometry(
+        parent->setGeometry(
             QStyle::alignedRect(
                 Qt::LeftToRight,
                 Qt::AlignCenter,
-                this->size(),
+                parent->size(),
                 qApp->desktop()->availableGeometry()
                 )
             );
@@ -54,6 +59,42 @@ public:
     }
 
     QWidget* GetForm() { return form;  }
+
+    template<typename T>
+    T* find_child(QString widget_name)
+    {
+        return form->findChild<T*>(widget_name);
+    }
+
+    /// Types that models Sender type concept: QPushButton, QCheckBox
+    template<typename Sender, typename Callback>
+    void on_clicked(QString widget_name, Callback&& event_handler)
+    {
+        Sender* pSender = form->findChild<Sender*>(widget_name);
+        if(pSender == nullptr){
+            using namespace std::string_literals;
+            throw std::runtime_error("Error: Unable to load widget named: <"s
+                                     + widget_name.toStdString()
+                                     + "> from the form file "s + formFile.toStdString());
+        }
+        QObject::connect(pSender, &Sender::clicked, event_handler);
+    }
+
+    template<typename Callback>
+    void on_button_clicked(QString widget_name, Callback&& event_handler)
+    {
+        this->on_clicked<QPushButton>(widget_name, event_handler);
+    }
+
+    /// Types that models Sender type concept: QListWidget, QTableWidget
+    template<typename Sender, typename Callback>
+    void on_double_clicked(QString widget_name, Callback&& event_handler)
+    {
+        Sender* pSender = form->findChild<Sender*>(widget_name);
+        assert(pSender != nullptr);
+        QObject::connect(pSender, &Sender::doubleClicked, event_handler);
+    }
+
 };
 
 
