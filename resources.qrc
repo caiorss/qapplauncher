@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/assets">
         <file>user_interface.ui</file>
+        <file>appicon.png</file>
     </qresource>
 </RCC>
