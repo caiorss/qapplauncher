@@ -74,6 +74,9 @@ public:
     {
         form = this->FormLoader::GetForm();
 
+        // Do not quit when user clicks at close button
+        this->setAttribute(Qt::WA_QuitOnClose, false);
+
         //========= Tab - Application Launcher ==============///
 
         // Load controls named in the form "user_interface.ui"
