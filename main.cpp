@@ -96,7 +96,7 @@ public:
         // Do not quit when user clicks at close button
         this->setAttribute(Qt::WA_QuitOnClose, false);
 
-        tray_icon = qtutils::make_window_toggle_tray_icon(
+        tray_icon = qtutils::make_window_toggle_trayicon(
             this,
             ":/assets/appicon.png"
             , "Tray Icon Test"
@@ -221,7 +221,15 @@ public:
             auto file = pItem->text();
             std::cout << " [INFO] Open file " << file.toStdString() << "\n";
             // Linux-only for a while
-            QDesktopServices::openUrl(QUrl("file://" + file, QUrl::TolerantMode));
+
+            auto file_uri_string = [&]
+            {
+                if(file.startsWith("http:") || file.startsWith("https:")
+                    ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
+                    return file;
+                return "file://" + file;
+            }();
+            QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
         };
 
         loader.on_button_clicked("btn_open_file", open_selected_bookmark_file);
