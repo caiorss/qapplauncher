@@ -102,7 +102,25 @@ public:
         // this->setWindowAlwaysOnTop();
         this->load_settings();
 
-        // ========== Set Event Handlers =================//
+        // ========== Event Handlers of tray Icon ===============================//
+
+        // Toggle this main window visible/hidden when user clicks at Tray Icon.
+        QObject::connect(tray_icon, &QSystemTrayIcon::activated
+                         , [&self = *this](QSystemTrayIcon::ActivationReason r)
+                         {
+                             // User clicked at QSystemTrayIcon
+                             if(r  == QSystemTrayIcon::Trigger)
+                             {
+                                 if(!self.isVisible())
+                                     self.show();
+                                 else
+                                     self.hide();
+                                 return;
+                             }
+                             // std::cout << " [TRACE] TrayIcon Clicked OK." << std::endl;
+                         });
+
+        // ========== Set Event Handlers of Application Launcher Tab ============//
 
         // Enable Drag and Drop Event
         this->setAcceptDrops(true);
