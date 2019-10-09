@@ -57,6 +57,16 @@ public:
     }
 
     QWidget* GetForm() { return form;  }
+
+    /// Types that models Sender type concept: QPushButton, QCheckBox
+    template<typename Sender, typename Callback>
+    void on_clicked(QString widget_name, Callback&& event_handler)
+    {
+        Sender* pSender = form->findChild<Sender*>(widget_name);
+        assert(pSender != nullptr);
+        QObject::connect(pSender, &Sender::clicked, event_handler);
+    }
+
 };
 
 
