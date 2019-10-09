@@ -67,6 +67,12 @@ public:
         QObject::connect(pSender, &Sender::clicked, event_handler);
     }
 
+    template<typename Callback>
+    void on_button_clicked(QString widget_name, Callback&& event_handler)
+    {
+        this->on_clicked<QPushButton>(widget_name, event_handler);
+    }
+
     /// Types that models Sender type concept: QListWidget, QTableWidget
     template<typename Sender, typename Callback>
     void on_double_clicked(QString widget_name, Callback&& event_handler)
