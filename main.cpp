@@ -27,6 +27,12 @@ namespace qtutils
         QObject::connect(pSender, &Sender::clicked, event_handler);
     }
 
+    template<typename Sender, typename Receiver, typename Method>
+    void on_clicked(Sender* pSender, Receiver* pReceiver, Method&& event_handler)
+    {
+        QObject::connect(pSender, &Sender::clicked, pReceiver, event_handler);
+    }
+
     // Sender widgets: QListWidget
     template<typename Sender, typename Callback>
     void on_double_clicked(Sender* pSender, Callback&& event_handler)
