@@ -67,6 +67,15 @@ public:
         QObject::connect(pSender, &Sender::clicked, event_handler);
     }
 
+    /// Types that models Sender type concept: QListWidget, QTableWidget
+    template<typename Sender, typename Callback>
+    void on_double_clicked(QString widget_name, Callback&& event_handler)
+    {
+        Sender* pSender = form->findChild<Sender*>(widget_name);
+        assert(pSender != nullptr);
+        QObject::connect(pSender, &Sender::doubleClicked, event_handler);
+    }
+
 };
 
 
