@@ -107,6 +107,13 @@ public:
 
         // ========== Set Event Handlers =================//
 
+        // Enable Drag and Drop Event
+        this->setAcceptDrops(true);
+        // tab_file_bookmarks->setAcceptDrops(true);
+        // tview_disp->setAcceptDrops(true);
+        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");
+
+        btn_add_file->setAcceptDrops(true);
 
         // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
         qtutils::on_clicked(chb_always_on_top,
@@ -262,6 +269,7 @@ public:
 
     }
 
+    /// Load application state
     void load_settings()
     {
         QString settings_file = this->get_settings_file();
@@ -285,6 +293,7 @@ public:
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
     }
 
+    /// Save application state
     void save_settings()
     {
         auto settings_file = this->get_settings_file();
@@ -309,6 +318,23 @@ public:
         settings.sync();
     }
 
+    void dragEnterEvent(QDragEnterEvent* event) override
+    {
+        // if(event->source() != this->tab_file_bookmarks) return;
+
+        if(this->tab_file_bookmarks->isVisible())
+        {
+            const QMimeData* mimeData = event->mimeData();
+            std::cout << "Drag Event" << std::endl;
+            if(!mimeData->hasUrls())
+                return;
+            QString path = mimeData->urls()[0].toLocalFile();
+            std::cout << " [TRACE] Dragged file: " << path.toStdString() << "\n";
+            this->tview_disp->addItem(path);
+            this->save_settings();
+        }
+
+    }
 
 };
 
