@@ -43,9 +43,10 @@ namespace qtutils
 }
 
 
-class ApplicationLauncher: public FormLoader
+class ApplicationLauncher: public QMainWindow
 {
 private:
+    FormLoader   loader;
     QWidget*     form;
     // Extract children widgets from from file
     QLineEdit*   cmd_input;
@@ -70,9 +71,10 @@ public:
 
 
     ApplicationLauncher()
-        : FormLoader(":/assets/user_interface.ui")
+        : loader{FormLoader(this, ":/assets/user_interface.ui")}
     {
-        form = this->FormLoader::GetForm();
+
+        form = loader.GetForm();
 
         // Do not quit when user clicks at close button
         this->setAttribute(Qt::WA_QuitOnClose, false);

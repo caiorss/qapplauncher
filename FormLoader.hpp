@@ -10,27 +10,30 @@
 /**
   * Class FormLoader is a helper for loading QtWidgets dynamically
   * from a Form without compilation. */
-class FormLoader: public QMainWindow
+class FormLoader
 {
 private:
     QString  formFile;
     QWidget* form;
+    QWidget* m_parent;
 public:
-    FormLoader(QString path)
+    FormLoader(QMainWindow* parent, QString path)
     {
+        m_parent = parent;
+
         this->LoadForm(path);
-        this->setCentralWidget(form);
-        this->setWindowTitle(form->windowTitle());
+        parent->setCentralWidget(form);
+        parent->setWindowTitle(form->windowTitle());
 
         // Set Width and height
-        this->resize(form->width(), form->height());
+        parent->resize(form->width(), form->height());
 
         // Center Window in the screen
-        this->setGeometry(
+        parent->setGeometry(
             QStyle::alignedRect(
                 Qt::LeftToRight,
                 Qt::AlignCenter,
-                this->size(),
+                parent->size(),
                 qApp->desktop()->availableGeometry()
                 )
             );
