@@ -163,9 +163,9 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_file_bookmark">
+    <widget class="QWidget" name="tab_file_bookmarks">
      <attribute name="title">
-      <string>Desktop Capture</string>
+      <string>Desktop Bookmarks</string>
      </attribute>
      <widget class="QTextEdit" name="textEdit">
       <property name="geometry">
