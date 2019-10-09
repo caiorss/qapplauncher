@@ -1,3 +1,8 @@
+/**  Brief: Application Main Window
+ *   Author: Caio Rodrigues - caiorss [at] rodrigues [at] gmail [dot] com
+ *
+ *
+ ************************************************************/
 #include <iostream>
 #include <iomanip>
 #include <functional>
@@ -29,8 +34,9 @@ namespace qtutils
         QObject::connect(pSender, &Sender::doubleClicked, event_handler);
     }
 
+    /** Creates a tray icon that toggles main window visiblity when clicked. */
     QSystemTrayIcon*
-    make_tray_icon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
+    make_window_toggle_tray_icon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
     {
         auto tray = new QSystemTrayIcon(wnd);
         auto appIcon = QIcon(icon_path);
@@ -72,9 +78,6 @@ public:
 
         form = loader.GetForm();
 
-        // Do not quit when user clicks at close button
-        this->setAttribute(Qt::WA_QuitOnClose, false);
-
         //========= Tab - Application Launcher ==============///
 
         // Load controls named in the form "user_interface.ui"
@@ -90,12 +93,14 @@ public:
 
         //========= Create Tray Icon =======================//
 
-        tray_icon = qtutils::make_tray_icon(this,
-                                            ":/assets/appicon.png"
-                                            , "Tray Icon Test");
+        // Do not quit when user clicks at close button
+        this->setAttribute(Qt::WA_QuitOnClose, false);
 
-
-
+        tray_icon = qtutils::make_window_toggle_tray_icon(
+            this,
+            ":/assets/appicon.png"
+            , "Tray Icon Test"
+            );
 
         //========= Load Application state =================//
 
