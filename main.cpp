@@ -50,18 +50,12 @@ private:
     QWidget*     form;
     // Extract children widgets from from file
     QLineEdit*   cmd_input;
-    QPushButton* btn_add;
-    QPushButton* btn_run;
-    QPushButton* btn_remove;
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
     QListWidget* cmd_registry;
 
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
-    QPushButton* btn_add_file;
-    QPushButton* btn_open_file;
-    QPushButton* btn_remove_file;
     QListWidget* tview_disp;
 
     //======== TrayIcon =============================//
@@ -82,21 +76,14 @@ public:
         //========= Tab - Application Launcher ==============///
 
         // Load controls named in the form "user_interface.ui"
-        cmd_input    = form->findChild<QLineEdit*>("cmd_input");
-        btn_add      = form->findChild<QPushButton*>("btn_add");
-        btn_remove   = form->findChild<QPushButton*>("btn_remove");
-        btn_run      = form->findChild<QPushButton*>("btn_run");
-        cmd_registry = form->findChild<QListWidget*>("cmd_registry");
-        chb_editable = form->findChild<QCheckBox*>("chb_editable");
-        chb_always_on_top = form->findChild<QCheckBox*>("chb_always_on_top");
+        cmd_input         = loader.find_child<QLineEdit>("cmd_input");
+        cmd_registry      = loader.find_child<QListWidget>("cmd_registry");
+        chb_editable      = loader.find_child<QCheckBox>("chb_editable");
+        chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
 
         //========= Tab - Desktop Capture =================//
-        tab_file_bookmarks = form->findChild<QWidget*>("tab_file_bookmarks");
-        btn_add_file = form->findChild<QPushButton*>("btn_add_file");
-        btn_open_file = form->findChild<QPushButton*>("btn_open_file");
-        btn_remove_file = form->findChild<QPushButton*>("btn_remove_file");
-
-        tview_disp = form->findChild<QListWidget*>("tview_disp");
+        tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
+        tview_disp = loader.find_child<QListWidget>("tview_disp");
         assert(tview_disp != nullptr);
 
         //========= Create Tray Icon =======================//
@@ -119,9 +106,7 @@ public:
         this->setAcceptDrops(true);
         // tab_file_bookmarks->setAcceptDrops(true);
         // tview_disp->setAcceptDrops(true);
-        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");
-
-        btn_add_file->setAcceptDrops(true);
+        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");       
 
         // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
         loader.on_clicked<QCheckBox>("chb_always_on_top",
