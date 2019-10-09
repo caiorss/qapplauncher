@@ -219,27 +219,17 @@ public:
                                      self.save_settings();
                                  });
 
-        auto open_selected_bookmark_file = [&self = *this]
-        {
-            QListWidgetItem* pItem= self.tview_disp->currentItem();
-            // Abort on error
-            if(!pItem){ return; }
-            auto file = pItem->text();
-            std::cout << " [INFO] Open file " << file.toStdString() << "\n";
-            // Linux-only for a while
 
-            auto file_uri_string = [&]
-            {
-                if(file.startsWith("http:") || file.startsWith("https:")
-                    ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
-                    return file;
-                return "file://" + file;
-            }();
-            QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
-        };
+        loader.on_button_clicked( "btn_open_file"
+                                 , this
+                                 , &ApplicationLauncher::open_selected_bookmark_file
+                                 );
 
-        loader.on_button_clicked("btn_open_file", open_selected_bookmark_file);
-        qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
+        // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
+        loader.on_double_clicked<QListWidget>( "tview_disp"
+                                              , this
+                                              , &ApplicationLauncher::open_selected_bookmark_file
+                                              );
 
         loader.on_button_clicked("btn_remove_file",
                             [&self = *this]
@@ -373,6 +363,27 @@ public:
             this->save_settings();
         }
 
+    }
+
+    /// Open bookmark file in the Desktop Bookmark Tab
+    void open_selected_bookmark_file()
+    {
+        auto& self = *this;
+        QListWidgetItem* pItem= self.tview_disp->currentItem();
+        // Abort on error
+        if(!pItem){ return; }
+        auto file = pItem->text();
+        std::cout << " [INFO] Open file " << file.toStdString() << "\n";
+        // Linux-only for a while
+
+        auto file_uri_string = [&]
+        {
+            if(file.startsWith("http:") || file.startsWith("https:")
+                ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
+                return file;
+            return "file://" + file;
+        }();
+        QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
     }
 
 };
