@@ -29,6 +29,16 @@ namespace qtutils
         QObject::connect(pSender, &Sender::doubleClicked, event_handler);
     }
 
+    QSystemTrayIcon*
+    make_tray_icon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
+    {
+        auto tray = new QSystemTrayIcon(wnd);
+        tray->setToolTip(tooltip);
+        auto appIcon = QIcon(icon_path);
+        wnd->setWindowIcon(appIcon);
+        tray->show();
+        return tray;
+    }
 }
 
 
@@ -50,6 +60,10 @@ private:
     QPushButton* btn_open_file;
     QPushButton* btn_remove_file;
     QListWidget* tview_disp;
+
+    //======== TrayIcon =============================//
+    QSystemTrayIcon* tray_icon;
+
 public:
 
 
@@ -77,6 +91,15 @@ public:
 
         tview_disp = form->findChild<QListWidget*>("tview_disp");
         assert(tview_disp != nullptr);
+
+        //========= Create Tray Icon =======================//
+
+        tray_icon = qtutils::make_tray_icon(this,
+                                            ":/assets/appicon.png"
+                                            , "Tray Icon Test");
+
+
+        //========= Load Application state =================//
 
         // this->setWindowAlwaysOnTop();
         this->load_settings();
