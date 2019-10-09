@@ -101,6 +101,8 @@ public:
                                             , "Tray Icon Test");
 
 
+
+
         //========= Load Application state =================//
 
         // this->setWindowAlwaysOnTop();
@@ -202,9 +204,8 @@ public:
             if(!pItem){ return; }
             auto file = pItem->text();
             std::cout << " [INFO] Open file " << file.toStdString() << "\n";
-            auto args = QList<QString>{file};
             // Linux-only for a while
-            bool status = QProcess::startDetached("xdg-open", args);
+            QDesktopServices::openUrl(QUrl("file://" + file, QUrl::TolerantMode));
         };
 
         qtutils::on_clicked(btn_open_file, open_selected_bookmark_file);
