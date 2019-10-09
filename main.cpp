@@ -12,6 +12,26 @@
 
 #include "FormLoader.hpp"
 
+namespace qtutils
+{
+
+    // Sender widgets: QPushButton, QListWidget, QCheckBox
+    template<typename Sender, typename Callback>
+    void on_clicked(Sender* pSender, Callback&& event_handler)
+    {
+        QObject::connect(pSender, &Sender::clicked, event_handler);
+    }
+
+    // Sender widgets: QListWidget
+    template<typename Sender, typename Callback>
+    void on_double_clicked(Sender* pSender, Callback&& event_handler)
+    {
+        QObject::connect(pSender, &Sender::doubleClicked, event_handler);
+    }
+
+}
+
+
 class ApplicationLauncher: public FormLoader
 {
 private:
