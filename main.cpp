@@ -56,6 +56,7 @@ private:
     QListWidget* cmd_registry;
 
     //======= Tab - Desktop Capture - Widgets =======//
+    QWidget*     tab_file_bookmarks;
     QPushButton* btn_add_file;
     QPushButton* btn_open_file;
     QPushButton* btn_remove_file;
@@ -84,7 +85,7 @@ public:
         chb_always_on_top = form->findChild<QCheckBox*>("chb_always_on_top");
 
         //========= Tab - Desktop Capture =================//
-
+        tab_file_bookmarks = form->findChild<QWidget*>("tab_file_bookmarks");
         btn_add_file = form->findChild<QPushButton*>("btn_add_file");
         btn_open_file = form->findChild<QPushButton*>("btn_open_file");
         btn_remove_file = form->findChild<QPushButton*>("btn_remove_file");
