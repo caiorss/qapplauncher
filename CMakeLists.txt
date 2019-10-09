@@ -31,6 +31,12 @@ endfunction()
 
 #=============== Target Configurations ============#
 
-add_executable(applauncher main.cpp FormLoader.hpp resources.qrc)
-target_link_libraries(applauncher Qt5::Core Qt5::Widgets Qt5::UiTools Qt5::Network)
+add_executable( applauncher
+                main.cpp
+                FormLoader.hpp
+                resources.qrc
+               )           
+target_link_libraries(applauncher
+    Qt5::Core Qt5::Widgets Qt5::UiTools Qt5::Network)
 
+copy_after_build( applauncher )

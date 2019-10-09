@@ -24,6 +24,12 @@ private:
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
     QListWidget* cmd_registry;
+
+    //======= Tab - Desktop Capture - Widgets =======//
+    QPushButton* btn_add_file;
+    QPushButton* btn_open_file;
+    QPushButton* btn_remove_file;
+    QListWidget* tview_disp;
 public:
 
 
@@ -31,6 +37,9 @@ public:
         : FormLoader(":/assets/user_interface.ui")
     {
         form = this->FormLoader::GetForm();
+
+        //========= Tab - Application Launcher ==============///
+
         // Load controls named in the form "user_interface.ui"
         cmd_input    = form->findChild<QLineEdit*>("cmd_input");
         btn_add      = form->findChild<QPushButton*>("btn_add");
@@ -39,6 +48,15 @@ public:
         cmd_registry = form->findChild<QListWidget*>("cmd_registry");
         chb_editable = form->findChild<QCheckBox*>("chb_editable");
         chb_always_on_top = form->findChild<QCheckBox*>("chb_always_on_top");
+
+        //========= Tab - Desktop Capture =================//
+
+        btn_add_file = form->findChild<QPushButton*>("btn_add_file");
+        btn_open_file = form->findChild<QPushButton*>("btn_open_file");
+        btn_remove_file = form->findChild<QPushButton*>("btn_remove_file");
+
+        tview_disp = form->findChild<QListWidget*>("tview_disp");
+        assert(tview_disp != nullptr);
 
         // this->setWindowAlwaysOnTop();
         this->load_settings();
@@ -120,6 +138,48 @@ public:
                              std::cout << " [INFO] Window closed Ok" << std::endl;
                          });
 
+        // =========== Event Handlers of Bookmark Table =========//
+
+        QObject::connect(btn_add_file, &QPushButton::clicked,
+                         [&self = *this]
+                         {
+                             QString file = QFileDialog::getOpenFileName(
+                                 &self, "Open File", ".");
+                             std::cout << " [INFO] Selected file = "
+                                       << file.toStdString() << std::endl;
+                             self.tview_disp->addItem(file);
+                             self.save_settings();
+                         });
+
+        auto open_selected_bookmark_file = [&self = *this]
+        {
+            QListWidgetItem* pItem= self.tview_disp->currentItem();
+            // Abort on error
+            if(!pItem){ return; }
+            auto file = pItem->text();
+            std::cout << " [INFO] Open file " << file.toStdString() << "\n";
+            auto args = QList<QString>{file};
+            // Linux-only for a while
+            bool status = QProcess::startDetached("xdg-open", args);
+        };
+
+        QObject::connect(btn_open_file, &QPushButton::clicked
+                         , open_selected_bookmark_file);
+
+        QObject::connect(tview_disp, &QTableWidget::doubleClicked
+                         , open_selected_bookmark_file);
+
+        QObject::connect(btn_remove_file, &QPushButton::clicked
+                         , [&self = *this]
+                         {
+                             QListWidgetItem* pItem = self.tview_disp->currentItem();
+                             if(pItem == nullptr) { return; }
+                             self.cmd_registry->removeItemWidget(pItem);
+                             delete pItem;
+                             self.save_settings();
+                         });
+
+
     } // --- End of CustomerForm ctor ------//
 
     // Run item selected in the QListWidget
@@ -182,6 +242,14 @@ public:
         for(auto const& cmd: commands){
             this->cmd_registry->addItem(cmd);
         }
+
+        auto files_bookmarks = settings.value("files_bookmarks/list")
+                                   .toStringList();
+
+        for(auto const& file: files_bookmarks){
+            this->tview_disp->addItem(file);
+        }
+
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
     }
 
@@ -190,6 +258,7 @@ public:
         auto settings_file = this->get_settings_file();
 
         auto settings = QSettings(settings_file, QSettings::IniFormat);
+
         QStringList list;
         for(int i = 0; i < this->cmd_registry->count(); i++)
         {
@@ -197,6 +266,14 @@ public:
             list << item->text();
         }
         settings.setValue("commands/list", list);
+
+        QStringList file_bookmarks;
+        for(int i = 0; i < this->tview_disp->count(); i++)
+        {
+            file_bookmarks << this->tview_disp->item(i)->text();
+        }
+        settings.setValue("files_bookmarks/list", file_bookmarks);
+
         settings.sync();
     }
 
@@ -209,8 +286,7 @@ int main(int argc, char** argv)
     std::cout << " [INFO] Starting Application" << std::endl;
 
     QApplication app(argc, argv);
-    app.setApplicationName("qapplauncher");
-
+    app.setApplicationName("qapplauncher");   
 
     ApplicationLauncher form;
     form.setWindowIcon(QIcon(":/images/appicon.png"));
