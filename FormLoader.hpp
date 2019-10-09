@@ -80,6 +80,20 @@ public:
         QObject::connect(pSender, &Sender::clicked, event_handler);
     }
 
+    template<typename Sender, typename Receiver, typename Method>
+    void on_clicked(QString widget_name, Receiver pReceiver, Method&& receiver_method)
+    {
+        Sender* pSender = form->findChild<Sender*>(widget_name);
+        if(pSender == nullptr){
+            using namespace std::string_literals;
+            throw std::runtime_error("Error: Unable to load widget named: <"s
+                                     + widget_name.toStdString()
+                                     + "> from the form file "s + formFile.toStdString());
+        }
+        QObject::connect(pSender, &Sender::clicked, pReceiver, receiver_method);
+    }
+
+
     template<typename Callback>
     void on_button_clicked(QString widget_name, Callback&& event_handler)
     {
