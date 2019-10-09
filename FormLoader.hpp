@@ -100,6 +100,12 @@ public:
         this->on_clicked<QPushButton>(widget_name, event_handler);
     }
 
+    template<typename Receiver, typename Method>
+    void on_button_clicked(QString widget_name, Receiver pReceiver, Method&& receiver_method)
+    {
+        this->on_clicked<QPushButton>(widget_name, pReceiver, receiver_method);
+    }
+
     /// Types that models Sender type concept: QListWidget, QTableWidget
     template<typename Sender, typename Callback>
     void on_double_clicked(QString widget_name, Callback&& event_handler)
