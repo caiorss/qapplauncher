@@ -124,37 +124,38 @@ public:
         btn_add_file->setAcceptDrops(true);
 
         // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
-        qtutils::on_clicked(chb_always_on_top,
-                            [&self = *this]
-                            {
-                              #if 1
-                                QMessageBox::warning( &self
-                                                     , "Error report"
-                                                     , "Functionality not implemented yet."
-                                                     );
+        loader.on_clicked<QCheckBox>("chb_always_on_top",
+                                     [&self = *this]
+                                     {
+                                #if 1
+                                         QMessageBox::warning( &self
+                                                              , "Error report"
+                                                              , "Functionality not implemented yet."
+                                                              );
                                 #endif
                                 // static auto flags = self.windowFlags();
                                 // flags ^=  Qt::WindowStaysOnTopHint;
                                 // self.show();
                                 // self.activateWindow();
-                            });
+                                 });
 
-        qtutils::on_clicked(btn_add,[&self = *this]
-                            {
-                             auto text = self.cmd_input->text();
-                                if(text.isEmpty()) { return; }
-                                auto item = new QListWidgetItem();
-                                item->setText(text);
-                                self.cmd_registry->insertItem(0, item);
-                                self.cmd_input->clear();
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_add", [&self = *this]
+                                 {
+                                     auto text = self.cmd_input->text();
+                                     if(text.isEmpty()) { return; }
+                                     auto item = new QListWidgetItem();
+                                     item->setText(text);
+                                     self.cmd_registry->insertItem(0, item);
+                                     self.cmd_input->clear();
+                                     self.save_settings();
+                                 });
+        // qtutils::on_clicked(btn_add,);
 
         // Signals and slots with member function pointer
         // QObject::connect(btn_remove, &QPushButton::clicked, this, &CustomerForm::Reset);
 
         // Signals and slots with lambda function
-        qtutils::on_clicked(btn_run, [self = this]{ self->run_selected_item(); });
+        loader.on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
 
 
         qtutils::on_double_clicked(cmd_registry, [&self = *this]
@@ -172,15 +173,15 @@ public:
                                        // auto command = items.first()->text();
                                    });
 
-        qtutils::on_clicked(btn_remove,
-                            [&self = *this]
-                            {
-                                QListWidgetItem* pItem = self.cmd_registry->currentItem();
-                                if(pItem == nullptr) { return; }
-                                self.cmd_registry->removeItemWidget(pItem);
-                                delete pItem;
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_remove",
+                                 [&self = *this]
+                                 {
+                                     QListWidgetItem* pItem = self.cmd_registry->currentItem();
+                                     if(pItem == nullptr) { return; }
+                                     self.cmd_registry->removeItemWidget(pItem);
+                                     delete pItem;
+                                     self.save_settings();
+                                 });
 
 
         // Save application state when the main Window is destroyed
@@ -191,16 +192,16 @@ public:
 
         // =========== Event Handlers of Bookmark Table =========//
 
-        qtutils::on_clicked(btn_add_file,
-                            [&self = *this]
-                            {
-                                QString file = QFileDialog::getOpenFileName(
-                                    &self, "Open File", ".");
-                                std::cout << " [INFO] Selected file = "
-                                          << file.toStdString() << std::endl;
-                                self.tview_disp->addItem(file);
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_add_file",
+                                 [&self = *this]
+                                 {
+                                     QString file = QFileDialog::getOpenFileName(
+                                         &self, "Open File", ".");
+                                     std::cout << " [INFO] Selected file = "
+                                               << file.toStdString() << std::endl;
+                                     self.tview_disp->addItem(file);
+                                     self.save_settings();
+                                 });
 
         auto open_selected_bookmark_file = [&self = *this]
         {
@@ -213,10 +214,10 @@ public:
             QDesktopServices::openUrl(QUrl("file://" + file, QUrl::TolerantMode));
         };
 
-        qtutils::on_clicked(btn_open_file, open_selected_bookmark_file);
+        loader.on_button_clicked("btn_open_file", open_selected_bookmark_file);
         qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
 
-        qtutils::on_clicked(btn_remove_file,
+        loader.on_button_clicked("btn_remove_file",
                             [&self = *this]
                             {
                                 QListWidgetItem* pItem = self.tview_disp->currentItem();
