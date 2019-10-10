@@ -174,11 +174,12 @@ public:
         loader.on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
 
 
-        qtutils::on_double_clicked(cmd_registry, [&self = *this]
+        // Launch application double clicked application from registry (QListWidget)
+        qtutils::on_double_clicked(app_registry, [&self = *this]
                                    {
                                        if(self.chb_editable->isChecked())
                                        {
-                                           auto item = self.cmd_registry->currentItem();
+                                           auto item = self.app_registry->currentItem();
                                            if(item == nullptr) { return; }
                                            // Set item as editable
                                            item->setFlags( item->flags() | Qt::ItemIsEditable);
@@ -208,38 +209,19 @@ public:
 
         // =========== Event Handlers of Bookmark Table =========//
 
-        loader.on_button_clicked("btn_add_file",
-                                 [&self = *this]
-                                 {
-                                     QString file = QFileDialog::getOpenFileName(
-                                         &self, "Open File", ".");
-                                     std::cout << " [INFO] Selected file = "
-                                               << file.toStdString() << std::endl;
-                                     self.tview_disp->addItem(file);
-                                     self.save_settings();
-                                 });
+        loader.on_button_clicked( "btn_add_file", this
+                                 , &ApplicationLauncher::add_bookmark_file);
 
 
-        loader.on_button_clicked( "btn_open_file"
-                                 , this
-                                 , &ApplicationLauncher::open_selected_bookmark_file
-                                 );
+        loader.on_button_clicked( "btn_open_file", this
+                                 , &ApplicationLauncher::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
-        loader.on_double_clicked<QListWidget>( "tview_disp"
-                                              , this
-                                              , &ApplicationLauncher::open_selected_bookmark_file
-                                              );
+        loader.on_double_clicked<QListWidget>( "tview_disp", this
+                                              , &ApplicationLauncher::open_selected_bookmark_file);
 
-        loader.on_button_clicked("btn_remove_file",
-                            [&self = *this]
-                            {
-                                QListWidgetItem* pItem = self.tview_disp->currentItem();
-                                if(pItem == nullptr) { return; }
-                                self.cmd_registry->removeItemWidget(pItem);
-                                delete pItem;
-                                self.save_settings();
-                            });
+        loader.on_button_clicked("btn_remove_file", this
+                                 , &ApplicationLauncher::remove_selected_bookmark_file);
 
 
         //================= Uitility Buttons =========================//
@@ -406,6 +388,27 @@ public:
             return "file://" + file;
         }();
         QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
+    }
+
+    void remove_selected_bookmark_file()
+    {
+        auto& self = *this;
+        QListWidgetItem* pItem = self.tview_disp->currentItem();
+        if(pItem == nullptr) { return; }
+        self.app_registry->removeItemWidget(pItem);
+        delete pItem;
+        self.save_settings();
+    }
+
+    void add_bookmark_file()
+    {
+        auto& self = *this;
+        QString file = QFileDialog::getOpenFileName(
+            &self, "Open File", ".");
+        std::cout << " [INFO] Selected file = "
+                  << file.toStdString() << std::endl;
+        self.tview_disp->addItem(file);
+        self.save_settings();
     }
 
 };
