@@ -18,15 +18,6 @@
 #include "FormLoader.hpp"
 #include "RecordTableModel.hpp"
 
-#if 0
-#define QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED() do { \
-             QMessageBox::warning( \
-                      nullptr, \
-                     "ERROR => Function not implemented",  \
-                     "Function <" ## __FUNCTION__ ## "> not implemented at " ## __LINE__ ); \
-         }  while(0)
-#endif
-
 namespace qtutils
 {
 
