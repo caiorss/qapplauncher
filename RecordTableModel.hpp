@@ -48,6 +48,15 @@ public:
         this->endInsertRows();
     }
 
+    /// Remove item N or row N
+    void remove_item(int n)
+    {
+        if(n > m_dataset.size()){ return; }
+        this->beginRemoveRows(QModelIndex(), n, n);
+        m_dataset.erase(m_dataset.begin() + n);
+        this->endRemoveRows();
+    }
+
     int count() const
     {
         return m_dataset.size();
@@ -56,7 +65,7 @@ public:
     TItem& at(int n)
     {
         return m_dataset.at(n);
-    }
+    }        
 
     // Return begin iterator
     auto begin() { return m_dataset.begin(); }
