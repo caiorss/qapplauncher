@@ -447,14 +447,13 @@ public:
     {
 
         // QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED();
-#if 0
         auto& self = *this;
-        QListWidgetItem* pItem = self.tview_disp->currentItem();
-        if(pItem == nullptr) { return; }
-        self.app_registry->removeItemWidget(pItem);
-        delete pItem;
+        auto index = self.tview_disp->currentIndex();
+        // Abort on error
+        if(!index.isValid()) { return; }
+        // QListWidgetItem* pItem = self.tview_disp->currentItem();
+        self.tview_model->remove_item(index.row());
         self.save_settings();
-#endif
     }
 
     void add_bookmark_file()
