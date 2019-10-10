@@ -121,6 +121,14 @@ public:
         tview_disp = loader.find_child<QTableView>("tview_disp");
         assert(tview_disp != nullptr);
 
+        // Check whether URI string is file or an URL, FTP ...
+        auto is_uri_file = [](QString const& uri_str)
+        {
+            return not( uri_str.startsWith("http://")
+                       || uri_str.startsWith("https://")
+                       || uri_str.startsWith("ftp://"));
+        };
+
         tview_model = new RecordTableModel<FileBookmarkItem>(
               this
             , {"File", "Path", "Description"}
