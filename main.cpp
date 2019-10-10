@@ -241,6 +241,28 @@ public:
                                 self.save_settings();
                             });
 
+
+        //================= Uitility Buttons =========================//
+
+        auto open_stdpath = [](QStandardPaths::StandardLocation p)
+        {
+            auto path = "file://" + QStandardPaths::standardLocations(p).at(0);
+            QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
+        };
+
+        loader.on_button_clicked("btn_open_home",
+                                 std::bind(open_stdpath, QStandardPaths::HomeLocation));
+
+        loader.on_button_clicked("btn_open_docs",
+                                 std::bind(open_stdpath, QStandardPaths::DocumentsLocation));
+
+        loader.on_button_clicked("btn_open_desktop",
+                                 std::bind(open_stdpath, QStandardPaths::DesktopLocation));
+
+        loader.on_button_clicked("btn_open_fonts",
+                                 std::bind(open_stdpath, QStandardPaths::FontsLocation));
+
+
     } // --- End of CustomerForm ctor ------//
 
     // Run item selected in the QListWidget (ApplicationRegistry)
