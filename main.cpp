@@ -66,7 +66,7 @@ private:
     QLineEdit*   cmd_input;
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
-    QListWidget* cmd_registry;
+    QListWidget* app_registry;
 
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
@@ -88,7 +88,7 @@ public:
 
         // Load controls named in the form "user_interface.ui"
         cmd_input         = loader.find_child<QLineEdit>("cmd_input");
-        cmd_registry      = loader.find_child<QListWidget>("cmd_registry");
+        app_registry      = loader.find_child<QListWidget>("cmd_registry");
         chb_editable      = loader.find_child<QCheckBox>("chb_editable");
         chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
 
@@ -161,7 +161,7 @@ public:
                                      if(text.isEmpty()) { return; }
                                      auto item = new QListWidgetItem();
                                      item->setText(text);
-                                     self.cmd_registry->insertItem(0, item);
+                                     self.app_registry->insertItem(0, item);
                                      self.cmd_input->clear();
                                      self.save_settings();
                                  });
@@ -192,9 +192,9 @@ public:
         loader.on_button_clicked("btn_remove",
                                  [&self = *this]
                                  {
-                                     QListWidgetItem* pItem = self.cmd_registry->currentItem();
+                                     QListWidgetItem* pItem = self.app_registry->currentItem();
                                      if(pItem == nullptr) { return; }
-                                     self.cmd_registry->removeItemWidget(pItem);
+                                     self.app_registry->removeItemWidget(pItem);
                                      delete pItem;
                                      self.save_settings();
                                  });
@@ -247,7 +247,7 @@ public:
     void run_selected_item()
     {
         auto& self = *this;
-        auto items = self.cmd_registry->selectedItems();
+        auto items = self.app_registry->selectedItems();
         if(items.isEmpty()) { return; }
         auto command = items.first()->text();
 
@@ -261,7 +261,7 @@ public:
     // See: https://stackoverflow.com/questions/18934964
     bool eventFilter(QObject* object, QEvent* event) override
     {
-        if(object == this->cmd_registry && event->type() == QEvent::KeyRelease)
+        if(object == this->app_registry && event->type() == QEvent::KeyRelease)
         {
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
             if(ke->key() == Qt::Key_Enter || Qt::Key_Return)
@@ -302,7 +302,7 @@ public:
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         auto commands = settings.value("commands/list").toStringList();
         for(auto const& cmd: commands){
-            this->cmd_registry->addItem(cmd);
+            this->app_registry->addItem(cmd);
         }
 
         auto files_bookmarks = settings.value("files_bookmarks/list")
@@ -323,9 +323,9 @@ public:
         auto settings = QSettings(settings_file, QSettings::IniFormat);
 
         QStringList list;
-        for(int i = 0; i < this->cmd_registry->count(); i++)
+        for(int i = 0; i < this->app_registry->count(); i++)
         {
-            QListWidgetItem* item = this->cmd_registry->item(i);
+            QListWidgetItem* item = this->app_registry->item(i);
             list << item->text();
         }
         settings.setValue("commands/list", list);
