@@ -70,7 +70,7 @@ private:
 
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
-    QListWidget* tview_disp;
+    QTableView*  tview_disp;
 
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
@@ -217,7 +217,7 @@ public:
                                  , &ApplicationLauncher::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
-        loader.on_double_clicked<QListWidget>( "tview_disp", this
+        loader.on_double_clicked<QTableView>( "tview_disp", this
                                               , &ApplicationLauncher::open_selected_bookmark_file);
 
         loader.on_button_clicked("btn_remove_file", this
