@@ -132,11 +132,20 @@ public:
         tview_model = new RecordTableModel<FileBookmarkItem>(
               this
             , {"File", "Path", "Description"}
-            , [](FileBookmarkItem const& item, int column) -> QString
+            , [=](FileBookmarkItem const& item, int column) -> QString
             {
-                if(column == 0) return item.uri_path;
-                if(column == 1) return "";
-                if(column == 2) return "Add file description";
+                QString file_name = item.uri_path;
+                QString file_path;
+
+                if(is_uri_file(item.uri_path))
+                {
+                    auto info = QFileInfo{item.uri_path};
+                    file_name = info.fileName();
+                    file_path = info.absolutePath();
+                }
+                if(column == 0) return file_name;
+                if(column == 1) return file_path;
+                if(column == 2) return "";
                 return QString();
             });
 
