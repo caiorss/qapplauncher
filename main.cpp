@@ -16,6 +16,16 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "FormLoader.hpp"
+#include "RecordTableModel.hpp"
+
+#if 0
+#define QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED() do { \
+             QMessageBox::warning( \
+                      nullptr, \
+                     "ERROR => Function not implemented",  \
+                     "Function <" ## __FUNCTION__ ## "> not implemented at " ## __LINE__ ); \
+         }  while(0)
+#endif
 
 namespace qtutils
 {
@@ -83,6 +93,7 @@ private:
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
     QTableView*  tview_disp;
+    RecordTableModel<FileBookmarkItem>* tview_model;
 
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
@@ -104,10 +115,24 @@ public:
         chb_editable      = loader.find_child<QCheckBox>("chb_editable");
         chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
 
-        //========= Tab - Desktop Capture =================//
+        //========= Tab - File Bookmark =================//
+
         tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
-        tview_disp = loader.find_child<QListWidget>("tview_disp");
+        tview_disp = loader.find_child<QTableView>("tview_disp");
         assert(tview_disp != nullptr);
+
+        tview_model = new RecordTableModel<FileBookmarkItem>(
+              this
+            , {"File", "Path", "Description"}
+            , [](FileBookmarkItem const& item, int column) -> QString
+            {
+                if(column == 0) return item.uri_path;
+                if(column == 1) return "";
+                if(column == 2) return "Add file description";
+                return QString();
+            });
+
+        tview_disp->setModel(tview_model);
 
         //========= Create Tray Icon =======================//
 
@@ -325,7 +350,7 @@ public:
                                    .toStringList();
 
         for(auto const& file: files_bookmarks){
-            this->tview_disp->addItem(file);
+            this->tview_model->add_item({file, "", ""});
         }
 
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
@@ -347,9 +372,9 @@ public:
         settings.setValue("commands/list", list);
 
         QStringList file_bookmarks;
-        for(int i = 0; i < this->tview_disp->count(); i++)
+        for(int i = 0; i < tview_model->count(); ++i)
         {
-            file_bookmarks << this->tview_disp->item(i)->text();
+            file_bookmarks << tview_model->at(i).uri_path;
         }
         settings.setValue("files_bookmarks/list", file_bookmarks);
 
@@ -375,7 +400,8 @@ public:
                 path = mimeData->urls()[0].toString();
 
             std::cout << " [TRACE] Dragged file: " << path.toStdString() << "\n";
-            this->tview_disp->addItem(path);
+            // this->tview_disp->addItem(path);
+            this->tview_model->add_item({path, "", ""});
             this->save_settings();
         }
 
@@ -384,6 +410,8 @@ public:
     /// Open bookmark file in the Desktop Bookmark Tab
     void open_selected_bookmark_file()
     {
+
+#if 0
         auto& self = *this;
         QListWidgetItem* pItem= self.tview_disp->currentItem();
         // Abort on error
@@ -400,16 +428,22 @@ public:
             return "file://" + file;
         }();
         QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
+#endif
+
     }
 
     void remove_selected_bookmark_file()
     {
+
+        // QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED();
+#if 0
         auto& self = *this;
         QListWidgetItem* pItem = self.tview_disp->currentItem();
         if(pItem == nullptr) { return; }
         self.app_registry->removeItemWidget(pItem);
         delete pItem;
         self.save_settings();
+#endif
     }
 
     void add_bookmark_file()
@@ -419,7 +453,7 @@ public:
             &self, "Open File", ".");
         std::cout << " [INFO] Selected file = "
                   << file.toStdString() << std::endl;
-        self.tview_disp->addItem(file);
+        self.tview_model->add_item({file, "", ""});
         self.save_settings();
     }
 
