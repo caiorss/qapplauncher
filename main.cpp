@@ -56,6 +56,18 @@ namespace qtutils
     }
 }
 
+struct FileBookmarkItem
+{
+    QString uri_path;
+    QString brief;
+    QString description;
+
+    FileBookmarkItem(){}
+    FileBookmarkItem(QString uri_path, QString brief, QString description):
+        uri_path(uri_path), brief(brief), description(description)
+    {}
+};
+
 
 class ApplicationLauncher: public QMainWindow
 {
