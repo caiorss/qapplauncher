@@ -122,7 +122,7 @@ public:
 
         tview_model = new RecordTableModel<FileBookmarkItem>(
               this
-            , {"File", "Path", "Description"}
+            , {"File", "Path"}
             , [=](FileBookmarkItem const& item, int column) -> QString
             {
                 QString file_name = item.uri_path;
