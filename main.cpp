@@ -428,12 +428,15 @@ public:
     void open_selected_bookmark_file()
     {
 
-#if 0
+#if 1
         auto& self = *this;
-        QListWidgetItem* pItem= self.tview_disp->currentItem();
-        // Abort on error
-        if(!pItem){ return; }
-        auto file = pItem->text();
+        auto index = tview_disp->currentIndex();
+
+        if(!index.isValid()) { return ; }
+
+        auto item  = tview_model->at(index.row());
+
+        auto file = item.uri_path;
         std::cout << " [INFO] Open file " << file.toStdString() << "\n";
         // Linux-only for a while
 
