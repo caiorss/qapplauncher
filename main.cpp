@@ -158,8 +158,9 @@ public:
 
         //========= Load Application state =================//
 
-        // this->setWindowAlwaysOnTop();
+        this->setWindowAlwaysOnTop();
         this->load_settings();
+        this->load_window_settings();
 
         // ========== Event Handlers of tray Icon ===============================//
 
