@@ -343,6 +343,36 @@ public:
 
     }
 
+    void load_window_settings()
+    {
+        auto settings = QSettings("com.org.applauncher", "applauncherD");
+
+        if(!settings.contains("window_pos"))
+            return;
+
+        if(!settings.contains("window_size"))
+            return;
+
+        auto pos = settings.value("window_pos").toPoint();
+        this->move(pos.x(), pos.y());
+
+        std::cout << " Position x = " << pos.x() << " ; y = " << pos.y() << std::endl;
+
+        auto size = settings.value("window_size").toSize();
+
+        std::cout << "Size w = " << size.width() << "; h = " << size.height() << std::endl;
+
+        if(size.width() < 0 || size.height() < 0)
+        {
+            size.setWidth(400);
+            size.setHeight(500);
+        }
+
+        this->resize(size);
+
+        std::cout << " [TRACE] Window settings loaded OK." << std::endl;
+    }
+
     /// Load application state
     void load_settings()
     {
