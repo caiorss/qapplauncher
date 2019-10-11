@@ -69,6 +69,41 @@ struct FileBookmarkItem
     {}
 };
 
+class FileBookmarkItemModel: public RecordTableModel<FileBookmarkItem>
+{
+public:
+    FileBookmarkItemModel(QWidget* parent, std::deque<QString> headers)
+        : RecordTableModel<FileBookmarkItem>(parent, headers)
+    {
+    }
+
+    QString
+    display_item_row(FileBookmarkItem const& item, int column) const override
+    {
+        // Check whether URI string is file or an URL, FTP ...
+        auto is_uri_file = [](QString const& uri_str)
+        {
+            return not( uri_str.startsWith("http://")
+                       || uri_str.startsWith("https://")
+                       || uri_str.startsWith("ftp://"));
+        };
+
+        QString file_name = item.uri_path;
+        QString file_path;
+
+        if(is_uri_file(item.uri_path))
+        {
+            auto info = QFileInfo{item.uri_path};
+            file_name = info.fileName();
+            file_path = info.absolutePath();
+        }
+        if(column == 0) return file_name;
+        if(column == 1) return file_path;
+        if(column == 2) return "";
+        return QString();
+    }
+};
+
 
 class ApplicationLauncher: public QMainWindow
 {
