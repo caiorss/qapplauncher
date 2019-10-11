@@ -31,11 +31,16 @@ endfunction()
 
 #=============== Target Configurations ============#
 
+#------- Target applauncher ----------------------------#
+
 add_executable( applauncher
                 main.cpp
+                RecordTableModel.hpp
                 FormLoader.hpp
                 resources.qrc
                )           
+copy_after_build( applauncher )
+
 target_link_libraries(applauncher
     Qt5::Core Qt5::Widgets Qt5::UiTools Qt5::Network)
 

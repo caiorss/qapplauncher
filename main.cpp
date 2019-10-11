@@ -16,6 +16,7 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "FormLoader.hpp"
+#include "RecordTableModel.hpp"
 
 namespace qtutils
 {
@@ -56,6 +57,68 @@ namespace qtutils
     }
 }
 
+struct FileBookmarkItem
+{
+    QString uri_path;
+    QString brief;
+    QString description;
+
+    FileBookmarkItem(){}
+    FileBookmarkItem(QString uri_path, QString brief, QString description):
+        uri_path(uri_path), brief(brief), description(description)
+    {}
+};
+
+class FileBookmarkItemModel: public RecordTableModel<FileBookmarkItem>
+{
+public:
+
+    FileBookmarkItemModel(){}
+
+    FileBookmarkItemModel(QWidget* parent)
+        : RecordTableModel<FileBookmarkItem>(parent)
+    {
+    }
+
+    // Constant
+    int column_count() const override { return 2; }
+
+    // Provide column name
+    QString
+    column_name(int column) const override
+    {
+        if(column == 0) { return "File/URI"; }
+        if(column == 1) { return "Path"; }
+        return QString{};
+    }
+
+    QString
+    display_item_row(FileBookmarkItem const& item, int column) const override
+    {
+        // Check whether URI string is file or an URL, FTP ...
+        auto is_uri_file = [](QString const& uri_str)
+        {
+            return not( uri_str.startsWith("http://")
+                       || uri_str.startsWith("https://")
+                       || uri_str.startsWith("ftp://"));
+        };
+
+        QString file_name = item.uri_path;
+        QString file_path;
+
+        if(is_uri_file(item.uri_path))
+        {
+            auto info = QFileInfo{item.uri_path};
+            file_name = info.fileName();
+            file_path = info.absolutePath();
+        }
+        if(column == 0) return file_name;
+        if(column == 1) return file_path;
+        if(column == 2) return "";
+        return QString();
+    }
+};
+
 
 class ApplicationLauncher: public QMainWindow
 {
@@ -70,7 +133,8 @@ private:
 
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
-    QListWidget* tview_disp;
+    QTableView*  tview_disp;
+    FileBookmarkItemModel* tview_model;
 
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
@@ -92,10 +156,17 @@ public:
         chb_editable      = loader.find_child<QCheckBox>("chb_editable");
         chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
 
-        //========= Tab - Desktop Capture =================//
+        //========= Tab - File Bookmark =================//
+
         tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
-        tview_disp = loader.find_child<QListWidget>("tview_disp");
-        assert(tview_disp != nullptr);
+        tview_disp = loader.find_child<QTableView>("tview_disp");
+        tview_disp->setSelectionMode(QTableView::SingleSelection);
+        tview_disp->setSelectionBehavior(QTableView::SelectRows);
+        tview_disp->setDragDropMode(QTableView::InternalMove);
+        tview_disp->setShowGrid(false);
+
+        tview_model = new FileBookmarkItemModel(this);
+        tview_disp->setModel(tview_model);
 
         //========= Create Tray Icon =======================//
 
@@ -110,8 +181,9 @@ public:
 
         //========= Load Application state =================//
 
-        // this->setWindowAlwaysOnTop();
+        this->setWindowAlwaysOnTop();
         this->load_settings();
+        this->load_window_settings();
 
         // ========== Event Handlers of tray Icon ===============================//
 
@@ -202,8 +274,9 @@ public:
 
 
         // Save application state when the main Window is destroyed
-        QObject::connect(this, &QMainWindow::destroyed, []
+        QObject::connect(this, &QMainWindow::destroyed, [this]
                          {
+                             this->save_window_settings();
                              std::cout << " [INFO] Window closed Ok" << std::endl;
                          });
 
@@ -217,7 +290,7 @@ public:
                                  , &ApplicationLauncher::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
-        loader.on_double_clicked<QListWidget>( "tview_disp", this
+        loader.on_double_clicked<QTableView>( "tview_disp", this
                                               , &ApplicationLauncher::open_selected_bookmark_file);
 
         loader.on_button_clicked("btn_remove_file", this
@@ -295,6 +368,46 @@ public:
 
     }
 
+    void load_window_settings()
+    {
+        auto settings = QSettings("com.org.applauncher", "applauncherD");
+
+        if(!settings.contains("window_pos"))
+            return;
+
+        if(!settings.contains("window_size"))
+            return;
+
+        auto pos = settings.value("window_pos").toPoint();
+        this->move(pos.x(), pos.y());
+
+        std::cout << " Position x = " << pos.x() << " ; y = " << pos.y() << std::endl;
+
+        auto size = settings.value("window_size").toSize();
+
+        std::cout << "Size w = " << size.width() << "; h = " << size.height() << std::endl;
+
+        if(size.width() < 0 || size.height() < 0)
+        {
+            size.setWidth(400);
+            size.setHeight(500);
+        }
+
+        this->resize(size);
+
+        std::cout << " [TRACE] Window settings loaded OK." << std::endl;
+    }
+
+    void save_window_settings()
+    {
+        // First parameter is the Company name, second parameter is the
+        // application name.
+        auto settings = QSettings("com.org.applauncher", "applauncherD");
+        settings.setValue("window_pos",  this->pos());
+        settings.setValue("window_size", this->size());
+        std::cout << " [TRACE] Window settings saved OK." << std::endl;
+    }
+
     /// Load application state
     void load_settings()
     {
@@ -313,7 +426,7 @@ public:
                                    .toStringList();
 
         for(auto const& file: files_bookmarks){
-            this->tview_disp->addItem(file);
+            this->tview_model->add_item({file, "", ""});
         }
 
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
@@ -323,9 +436,7 @@ public:
     void save_settings()
     {
         auto settings_file = this->get_settings_file();
-
         auto settings = QSettings(settings_file, QSettings::IniFormat);
-
         QStringList list;
         for(int i = 0; i < this->app_registry->count(); i++)
         {
@@ -335,9 +446,9 @@ public:
         settings.setValue("commands/list", list);
 
         QStringList file_bookmarks;
-        for(int i = 0; i < this->tview_disp->count(); i++)
+        for(int i = 0; i < tview_model->count(); ++i)
         {
-            file_bookmarks << this->tview_disp->item(i)->text();
+            file_bookmarks << tview_model->at(i).uri_path;
         }
         settings.setValue("files_bookmarks/list", file_bookmarks);
 
@@ -363,7 +474,8 @@ public:
                 path = mimeData->urls()[0].toString();
 
             std::cout << " [TRACE] Dragged file: " << path.toStdString() << "\n";
-            this->tview_disp->addItem(path);
+            // this->tview_disp->addItem(path);
+            this->tview_model->add_item({path, "", ""});
             this->save_settings();
         }
 
@@ -372,11 +484,16 @@ public:
     /// Open bookmark file in the Desktop Bookmark Tab
     void open_selected_bookmark_file()
     {
+
+#if 1
         auto& self = *this;
-        QListWidgetItem* pItem= self.tview_disp->currentItem();
-        // Abort on error
-        if(!pItem){ return; }
-        auto file = pItem->text();
+        auto index = tview_disp->currentIndex();
+
+        if(!index.isValid()) { return ; }
+
+        auto item  = tview_model->at(index.row());
+
+        auto file = item.uri_path;
         std::cout << " [INFO] Open file " << file.toStdString() << "\n";
         // Linux-only for a while
 
@@ -388,15 +505,20 @@ public:
             return "file://" + file;
         }();
         QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
+#endif
+
     }
 
     void remove_selected_bookmark_file()
     {
+
+        // QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED();
         auto& self = *this;
-        QListWidgetItem* pItem = self.tview_disp->currentItem();
-        if(pItem == nullptr) { return; }
-        self.app_registry->removeItemWidget(pItem);
-        delete pItem;
+        auto index = self.tview_disp->currentIndex();
+        // Abort on error
+        if(!index.isValid()) { return; }
+        // QListWidgetItem* pItem = self.tview_disp->currentItem();
+        self.tview_model->remove_item(index.row());
         self.save_settings();
     }
 
@@ -407,7 +529,7 @@ public:
             &self, "Open File", ".");
         std::cout << " [INFO] Selected file = "
                   << file.toStdString() << std::endl;
-        self.tview_disp->addItem(file);
+        self.tview_model->add_item({file, "", ""});
         self.save_settings();
     }
 

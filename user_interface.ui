@@ -311,16 +311,6 @@
        <string>File</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="tview_disp">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>60</y>
-        <width>641</width>
-        <height>151</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
@@ -372,6 +362,16 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QTableView" name="tview_disp">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>611</width>
+        <height>161</height>
+       </rect>
+      </property>
      </widget>
     </widget>
    </widget>
