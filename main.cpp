@@ -110,7 +110,9 @@ public:
 
         tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
         tview_disp = loader.find_child<QTableView>("tview_disp");
-        assert(tview_disp != nullptr);
+        tview_disp->setSelectionMode(QTableView::SingleSelection);
+        tview_disp->setSelectionBehavior(QTableView::SelectRows);
+        tview_disp->setDragDropMode(QTableView::InternalMove);
 
         // Check whether URI string is file or an URL, FTP ...
         auto is_uri_file = [](QString const& uri_str)
