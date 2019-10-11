@@ -373,6 +373,16 @@ public:
         std::cout << " [TRACE] Window settings loaded OK." << std::endl;
     }
 
+    void save_window_settings()
+    {
+        // First parameter is the Company name, second parameter is the
+        // application name.
+        auto settings = QSettings("com.org.applauncher", "applauncherD");
+        settings.setValue("window_pos",  this->pos());
+        settings.setValue("window_size", this->size());
+        std::cout << " [TRACE] Window settings saved OK." << std::endl;
+    }
+
     /// Load application state
     void load_settings()
     {
