@@ -19,25 +19,20 @@ template<typename TItem>
 class RecordTableModel: public QAbstractTableModel
 {
 public:
-    using column_index = int;
-    using column_render_func = std::function<QString (TItem const&, column_index)>;
 
-    RecordTableModel(  std::deque<QString> headers
-                     , column_render_func render_function
-                     )
+    RecordTableModel(  std::deque<QString> headers)
         : m_headers{ std::move(headers)}
-        , m_render_function{render_function}
     { }
 
-    RecordTableModel(  QWidget* parent,
-                       std::deque<QString> headers
-                     , column_render_func render_function
-                     )
+    RecordTableModel(  QWidget* parent, std::deque<QString> headers)
         : QAbstractTableModel(parent)
         , m_headers{ std::move(headers)}
-        , m_render_function{render_function}
     { }
 
+    virtual ~RecordTableModel() = default;
+
+    // Customization point: Derived classes must override this member function
+    virtual QString display_item_row(TItem const& item, int column_index) const = 0;
 
     void add_item(TItem item)
     {
@@ -120,7 +115,7 @@ public:
         if(role == Qt::DisplayRole)
         {
             auto& item = m_dataset.at( static_cast<size_t>(index.row()) );
-            return m_render_function(item, index.column());
+            return  this->display_item_row(item, index.column());
         }
         // FIXME: Implement me!
         return QVariant();
@@ -128,8 +123,7 @@ public:
 
 private:
     const std::deque<QString> m_headers;
-    std::deque<TItem>         m_dataset;
-    column_render_func         m_render_function;
+    std::deque<TItem>         m_dataset;   
 
 }; //---- End of class RecordTableModel ---//
 
