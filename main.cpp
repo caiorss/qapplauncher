@@ -251,8 +251,9 @@ public:
 
 
         // Save application state when the main Window is destroyed
-        QObject::connect(this, &QMainWindow::destroyed, []
+        QObject::connect(this, &QMainWindow::destroyed, [this]
                          {
+                             this->save_window_settings();
                              std::cout << " [INFO] Window closed Ok" << std::endl;
                          });
 
@@ -412,9 +413,7 @@ public:
     void save_settings()
     {
         auto settings_file = this->get_settings_file();
-
         auto settings = QSettings(settings_file, QSettings::IniFormat);
-
         QStringList list;
         for(int i = 0; i < this->app_registry->count(); i++)
         {
