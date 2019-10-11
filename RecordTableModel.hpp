@@ -20,18 +20,21 @@ class RecordTableModel: public QAbstractTableModel
 {
 public:
 
-    RecordTableModel(  std::deque<QString> headers)
-        : m_headers{ std::move(headers)}
+    RecordTableModel()
     { }
 
-    RecordTableModel(  QWidget* parent, std::deque<QString> headers)
-        : QAbstractTableModel(parent)
-        , m_headers{ std::move(headers)}
+    RecordTableModel(QWidget* parent): QAbstractTableModel(parent)
     { }
 
     virtual ~RecordTableModel() = default;
 
-    // Customization point: Derived classes must override this member function
+    // Number of columns
+    virtual int column_count() const = 0;
+
+    // Get the column name given its index
+    virtual QString column_name(int column_index) const = 0;
+
+    // Derived classes must override this member function
     virtual QString display_item_row(TItem const& item, int column_index) const = 0;
 
     void add_item(TItem item)
@@ -89,7 +92,8 @@ public:
         if(role != Qt::DisplayRole) { return QVariant{}; }
         if(orientation == Qt::Orientation::Horizontal)
         {
-            return m_headers[static_cast<size_t>(section)];
+            // return m_headers[static_cast<size_t>(section)];
+            return this->column_name(section);
         }
         return QString::number(section);
     }
@@ -103,7 +107,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override
     {
         Q_UNUSED(parent)
-        return static_cast<int>(m_headers.size());
+        return this->column_count();
     }
 
     QVariant
@@ -122,7 +126,6 @@ public:
     }
 
 private:
-    const std::deque<QString> m_headers;
     std::deque<TItem>         m_dataset;   
 
 }; //---- End of class RecordTableModel ---//

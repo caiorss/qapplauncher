@@ -72,9 +72,24 @@ struct FileBookmarkItem
 class FileBookmarkItemModel: public RecordTableModel<FileBookmarkItem>
 {
 public:
-    FileBookmarkItemModel(QWidget* parent, std::deque<QString> headers)
-        : RecordTableModel<FileBookmarkItem>(parent, headers)
+
+    FileBookmarkItemModel(){}
+
+    FileBookmarkItemModel(QWidget* parent)
+        : RecordTableModel<FileBookmarkItem>(parent)
     {
+    }
+
+    // Constant
+    int column_count() const override { return 2; }
+
+    // Provide column name
+    QString
+    column_name(int column) const override
+    {
+        if(column == 0) { return "File/URI"; }
+        if(column == 1) { return "Path"; }
+        return QString{};
     }
 
     QString
@@ -150,8 +165,7 @@ public:
         tview_disp->setDragDropMode(QTableView::InternalMove);
         tview_disp->setShowGrid(false);
 
-
-        tview_model = new FileBookmarkItemModel(this, {"File", "Path"});
+        tview_model = new FileBookmarkItemModel(this);
         tview_disp->setModel(tview_model);
 
         //========= Create Tray Icon =======================//
