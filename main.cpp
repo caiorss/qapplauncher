@@ -113,6 +113,7 @@ public:
         tview_disp->setSelectionMode(QTableView::SingleSelection);
         tview_disp->setSelectionBehavior(QTableView::SelectRows);
         tview_disp->setDragDropMode(QTableView::InternalMove);
+        tview_disp->setShowGrid(false);
 
         // Check whether URI string is file or an URL, FTP ...
         auto is_uri_file = [](QString const& uri_str)
