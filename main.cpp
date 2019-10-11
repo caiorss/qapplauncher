@@ -119,7 +119,7 @@ private:
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*     tab_file_bookmarks;
     QTableView*  tview_disp;
-    RecordTableModel<FileBookmarkItem>* tview_model;
+    FileBookmarkItemModel* tview_model;
 
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
@@ -150,34 +150,8 @@ public:
         tview_disp->setDragDropMode(QTableView::InternalMove);
         tview_disp->setShowGrid(false);
 
-        // Check whether URI string is file or an URL, FTP ...
-        auto is_uri_file = [](QString const& uri_str)
-        {
-            return not( uri_str.startsWith("http://")
-                       || uri_str.startsWith("https://")
-                       || uri_str.startsWith("ftp://"));
-        };
 
-        tview_model = new RecordTableModel<FileBookmarkItem>(
-              this
-            , {"File", "Path"}
-            , [=](FileBookmarkItem const& item, int column) -> QString
-            {
-                QString file_name = item.uri_path;
-                QString file_path;
-
-                if(is_uri_file(item.uri_path))
-                {
-                    auto info = QFileInfo{item.uri_path};
-                    file_name = info.fileName();
-                    file_path = info.absolutePath();
-                }
-                if(column == 0) return file_name;
-                if(column == 1) return file_path;
-                if(column == 2) return "";
-                return QString();
-            });
-
+        tview_model = new FileBookmarkItemModel(this, {"File", "Path"});
         tview_disp->setModel(tview_model);
 
         //========= Create Tray Icon =======================//
