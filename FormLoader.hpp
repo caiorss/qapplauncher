@@ -63,7 +63,17 @@ public:
     template<typename T>
     T* find_child(QString widget_name)
     {
-        return form->findChild<T*>(widget_name);
+        T* p_widget = form->findChild<T*>(widget_name);
+        // Throws exception if widget is not found in order to
+        // make the failure easier to trace.
+        if(p_widget == nullptr)
+        {
+            using namespace std::string_literals;
+            throw std::runtime_error("Error: Unable to load widget named: <"s
+                                     + widget_name.toStdString()
+                                     + "> from the form file "s + formFile.toStdString());
+        }
+        return p_widget;
     }
 
     /// Types that models Sender type concept: QPushButton, QCheckBox
