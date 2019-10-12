@@ -92,6 +92,13 @@ public:
         return QString{};
     }
 
+    // All columns are not editable by the user in the TableView, although
+    // items can be modified by changing the model in the code.
+    bool is_column_editable(int column) const override
+    {
+        return false;
+    }
+
     QString
     display_item_row(FileBookmarkItem const& item, int column) const override
     {
