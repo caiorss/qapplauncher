@@ -32,6 +32,9 @@
  *   + Simple Widget Mapper Example
  *    - https://doc.qt.io/archives/4.6/itemviews-simplewidgetmapper.html
  *
+ *   + How to make a constant correct read only model view architecture in QT?
+ *    - https://stackoverflow.com/questions/9988342/
+ *
  **************************************************************************/
 template<typename TItem>
 class RecordTableModel: public QAbstractTableModel
@@ -55,7 +58,13 @@ public:
     // Derived classes must override this member function
     virtual QString display_item_row(TItem const& item, int column) const = 0;
 
+    // Implementation must decide how to set model's columns.
     virtual bool set_element(int column, QVariant value, TItem& item) = 0;
+
+    // Implementation must decide which columns are editable or not in the view
+    // If the column 0 is editable, this function returns true for this column,
+    // if the column 1 is not editable, this function returns false for column 1.
+    virtual bool is_column_editable(int column) const = 0;
 
     void add_item(TItem item)
     {
@@ -154,8 +163,12 @@ public:
         // return  Qt::ItemIsEnabled;
         if (!index.isValid())
             return Qt::ItemIsEnabled;
-        // All columns are editable
 
+        // Make column read-only by the user if it is not editable.
+        if(!this->is_column_editable(index.column()))
+            return QAbstractTableModel::flags(index) & ~Qt::ItemIsEditable;
+
+        // All columns are editable
         return QAbstractTableModel::flags(index)
                | Qt::ItemIsEnabled | Qt::ItemIsSelectable
                | Qt::ItemIsUserCheckable |  Qt::ItemIsEditable;
