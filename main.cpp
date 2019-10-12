@@ -103,6 +103,7 @@ public:
                        || uri_str.startsWith("ftp://"));
         };
 
+#if 0
         QString file_name = item.uri_path;
         QString file_path;
 
@@ -115,8 +116,31 @@ public:
         if(column == 0) return file_name;
         if(column == 1) return file_path;
         if(column == 2) return "";
-        return QString();
+#endif
+        if(column == 0) return item.uri_path;
+        if(column == 1) return item.brief;
+        if(column == 2) return item.description;
+        return QString("<EMPTY>");
     }
+
+    bool
+    set_element(int column, QVariant value, FileBookmarkItem& item) override
+    {
+        if(column == 0){
+            item.uri_path = value.toString();
+            return true;
+        }
+        if(column == 1){
+            item.brief = value.toString();
+            return true;
+        }
+        if(column == 2){
+            item.description = value.toString();
+            return true;
+        }
+        return false;
+    }
+
 };
 
 
@@ -167,6 +191,30 @@ public:
 
         tview_model = new FileBookmarkItemModel(this);
         tview_disp->setModel(tview_model);
+
+
+        auto entry_filename  = loader.find_child<QLineEdit>("entry_filename");
+        auto entry_filetitle = loader.find_child<QLineEdit>("entry_filetitle");
+        auto entry_filedesc  = loader.find_child<QLineEdit>("entry_filedesc");
+
+        QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
+        mapper->setModel(tview_model);
+        mapper->addMapping(entry_filename,  0, "text");
+        mapper->addMapping(entry_filetitle, 1, "text");
+        mapper->toFirst();
+
+        // Event triggered when the selection of current row is changed.
+        QObject::connect(tview_disp->selectionModel(),
+                         &QItemSelectionModel::currentRowChanged,
+                         [=](QModelIndex i1, QModelIndex i2)
+                         {
+                             std::cout << " [TRACE] Selection changed to index = "
+                                       << i1.row() << std::endl;
+                             mapper->setCurrentModelIndex(i1);
+                         });
+
+        // Update all widgets whenever a new selection iof QTableView changes
+
 
         //========= Create Tray Icon =======================//
 
@@ -290,11 +338,15 @@ public:
                                  , &ApplicationLauncher::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
+#if 0
         loader.on_double_clicked<QTableView>( "tview_disp", this
                                               , &ApplicationLauncher::open_selected_bookmark_file);
+#endif
 
         loader.on_button_clicked("btn_remove_file", this
                                  , &ApplicationLauncher::remove_selected_bookmark_file);
+
+
 
 
         //================= Uitility Buttons =========================//

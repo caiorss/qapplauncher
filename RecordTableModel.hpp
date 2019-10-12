@@ -15,6 +15,24 @@
 #include <QApplication>
 #include <QSysInfo>
 
+/**
+ *
+ *  Note: References that helped implementing this class.
+ *
+ *
+ *   + How to prevent QTableView item from getting cleared on double-click
+ *     - https://stackoverflow.com/questions/28081988/
+ *
+ *   + Address Book Example
+ *    - https://doc.qt.io/archives/4.6/itemviews-addressbook.html
+ *
+ *   + Mapping Data Into Widgets
+ *    - http://www.crossplatform.ru/node/314
+ *
+ *   + Simple Widget Mapper Example
+ *    - https://doc.qt.io/archives/4.6/itemviews-simplewidgetmapper.html
+ *
+ **************************************************************************/
 template<typename TItem>
 class RecordTableModel: public QAbstractTableModel
 {
@@ -32,10 +50,12 @@ public:
     virtual int column_count() const = 0;
 
     // Get the column name given its index
-    virtual QString column_name(int column_index) const = 0;
+    virtual QString column_name(int column) const = 0;
 
     // Derived classes must override this member function
-    virtual QString display_item_row(TItem const& item, int column_index) const = 0;
+    virtual QString display_item_row(TItem const& item, int column) const = 0;
+
+    virtual bool set_element(int column, QVariant value, TItem& item) = 0;
 
     void add_item(TItem item)
     {
@@ -116,7 +136,7 @@ public:
         if (!index.isValid())
             return QVariant();
 
-        if(role == Qt::DisplayRole)
+        if(role == Qt::DisplayRole || role == Qt::EditRole)
         {
             auto& item = m_dataset.at( static_cast<size_t>(index.row()) );
             return  this->display_item_row(item, index.column());
@@ -125,11 +145,80 @@ public:
         return QVariant();
     }
 
+    /** QT Docs: The base class implementation returns a combination of flags that
+     *  enables the item (ItemIsEnabled) and allows it to be selected (ItemIsSelectable).
+     ***************************************************************************/
+    Qt::ItemFlags
+    flags(const QModelIndex &index) const override
+    {
+        // return  Qt::ItemIsEnabled;
+        if (!index.isValid())
+            return Qt::ItemIsEnabled;
+        // All columns are editable
+
+        return QAbstractTableModel::flags(index)
+               | Qt::ItemIsEnabled | Qt::ItemIsSelectable
+               | Qt::ItemIsUserCheckable |  Qt::ItemIsEditable;
+        // return QAbstractTableModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsSelectable;
+    }
+
+    /**  Inserts item in the table model, item by item, not row by row
+     *
+     *  @param index - pair row, column of current element being edited.
+     *  @param value - New value of the element being edited
+     *  @param role  - Sets the type of operation on the table item
+     *
+     * QT Docs:
+     *  The dataChanged() signal should be emitted if the data was successfully set.
+     *  The base class implementation returns false. This function and data()
+     *  must be reimplemented for editable models.
+     ***********************************************************************/
+    bool
+    setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override
+    {
+        if(!index.isValid() && role != Qt::EditRole) { return false; }
+        int row = index.row();
+        int col = index.column();
+        TItem& item = m_dataset[row];
+        if(set_element(col, value, item))
+        {
+            emit this->dataChanged(index, index);
+            return true;
+        }
+        return false;
+    }
+
+
 private:
     std::deque<TItem>         m_dataset;   
 
 }; //---- End of class RecordTableModel ---//
 
+
+#if 0
+bool TableModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.isValid() && role == Qt::EditRole) {
+        int row = index.row();
+
+        QPair<QString, QString> p = listOfPairs.value(row);
+
+        if (index.column() == 0)
+            p.first = value.toString();
+        else if (index.column() == 1)
+            p.second = value.toString();
+        else
+            return false;
+
+        listOfPairs.replace(row, p);
+        emit(dataChanged(index, index));
+
+        return true;
+    }
+
+    return false;
+}
+#endif
 
 
 #endif // RECORDTABLEMODEL_HPP
