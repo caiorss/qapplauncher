@@ -195,30 +195,4 @@ private:
 }; //---- End of class RecordTableModel ---//
 
 
-#if 0
-bool TableModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (index.isValid() && role == Qt::EditRole) {
-        int row = index.row();
-
-        QPair<QString, QString> p = listOfPairs.value(row);
-
-        if (index.column() == 0)
-            p.first = value.toString();
-        else if (index.column() == 1)
-            p.second = value.toString();
-        else
-            return false;
-
-        listOfPairs.replace(row, p);
-        emit(dataChanged(index, index));
-
-        return true;
-    }
-
-    return false;
-}
-#endif
-
-
 #endif // RECORDTABLEMODEL_HPP
