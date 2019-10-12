@@ -75,7 +75,7 @@ public:
 
     FileBookmarkItemModel(){}
 
-    FileBookmarkItemModel(QWidget* parent)
+    explicit FileBookmarkItemModel(QWidget* parent)
         : RecordTableModel<FileBookmarkItem>(parent)
     {
     }
