@@ -33,7 +33,7 @@ void on_double_clicked(Sender* pSender, Callback&& event_handler)
 }
 
 /** Creates a tray icon that toggles main window visiblity when clicked. */
-QSystemTrayIcon*
+inline QSystemTrayIcon*
 make_window_toggle_trayicon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
 {
     auto tray = new QSystemTrayIcon(wnd);
