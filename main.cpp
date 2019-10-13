@@ -261,9 +261,7 @@ public:
 
     /// Open bookmark file in the Desktop Bookmark Tab
     void open_selected_bookmark_file()
-    {
-
-#if 1
+    {        
         auto& self = *this;
         auto index = tview_disp->currentIndex();
 
@@ -275,15 +273,14 @@ public:
         std::cout << " [INFO] Open file " << file.toStdString() << "\n";
         // Linux-only for a while
 
-        auto file_uri_string = [&]
+        auto url = [&]
         {
             if(file.startsWith("http:") || file.startsWith("https:")
                 ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
-                return file;
-            return "file://" + file;
+                return QUrl(file, QUrl::TolerantMode);
+            return QUrl::fromLocalFile(file);
         }();
-        QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
-#endif
+        QDesktopServices::openUrl(url);
     }
 
     void remove_selected_bookmark_file()
