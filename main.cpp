@@ -20,19 +20,6 @@
 #include "FormLoader.hpp"
 #include "RecordTableModel.hpp"
 #include "tab_applicationlauncher.hpp"
-
-struct FileBookmarkItem
-{
-    QString uri_path;
-    QString brief;
-    QString description;
-
-    FileBookmarkItem(){}
-    FileBookmarkItem(QString uri_path, QString brief, QString description):
-        uri_path(uri_path), brief(brief), description(description)
-    {}
-};
-
 class FileBookmarkItemModel: public RecordTableModel<FileBookmarkItem>
 {
 public:
