@@ -46,28 +46,24 @@ FileBookmarkItemModel::display_item_row(FileBookmarkItem const& item, int column
                    || uri_str.startsWith("ftp://"));
     };
 
-#if 1
     QString file_name = item.uri_path;
     QString file_path;
-    QString item_type = "url";
+    QString item_type = "URL";
 
     if(is_uri_file(item.uri_path))
     {
         auto info = QFileInfo{item.uri_path};
         file_name = info.fileName();
         file_path = info.absolutePath();
-        item_type = "file";
+
+        if(QFileInfo(item.uri_path).isFile())
+            item_type = "FILE";
+        else
+            item_type = "DIR";
     }
     if(column == 0) return item_type;
     if(column == 1) return file_name;
-    if(column == 2) return file_path;;
-#endif
-
-#if 0
-        if(column == 0) return item.uri_path;
-        if(column == 1) return item.brief;
-        if(column == 2) return item.description;
-#endif
+    if(column == 2) return file_path;
 
     return QString("<EMPTY>");
 }
