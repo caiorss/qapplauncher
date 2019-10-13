@@ -8,6 +8,7 @@
 #include <functional>
 #include <cassert>
 #include <sstream>
+#include <memory>
 
 #include <QtWidgets>
 #include <QApplication>
@@ -15,234 +16,39 @@
 #include <QSysInfo>
 #include <QtConcurrent/QtConcurrent>
 
+//------ Headers of helper classes and namespaces -------//
+#include "qtutils.hpp"
 #include "FormLoader.hpp"
 #include "RecordTableModel.hpp"
 
-namespace qtutils
-{
 
-    // Sender widgets: QPushButton, QListWidget, QCheckBox
-    template<typename Sender, typename Callback>
-    void on_clicked(Sender* pSender, Callback&& event_handler)
-    {
-        QObject::connect(pSender, &Sender::clicked, event_handler);
-    }
+// ----- Headers of Domain Classes -----//
+#include "filebookmarkitemmodel.hpp"
+#include "FileBookmarkItem.hpp"
+#include "tab_applicationlauncher.hpp"
+#include "tab_desktopbookmarks.hpp"
 
-    template<typename Sender, typename Receiver, typename Method>
-    void on_clicked(Sender* pSender, Receiver* pReceiver, Method&& event_handler)
-    {
-        QObject::connect(pSender, &Sender::clicked, pReceiver, event_handler);
-    }
-
-    // Sender widgets: QListWidget
-    template<typename Sender, typename Callback>
-    void on_double_clicked(Sender* pSender, Callback&& event_handler)
-    {
-        QObject::connect(pSender, &Sender::doubleClicked, event_handler);
-    }
-
-    /** Creates a tray icon that toggles main window visiblity when clicked. */
-    QSystemTrayIcon*
-    make_window_toggle_trayicon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
-    {
-        auto tray = new QSystemTrayIcon(wnd);
-        auto appIcon = QIcon(icon_path);
-        assert(!appIcon.isNull());
-
-        wnd->setWindowIcon(appIcon);
-        tray->setIcon(appIcon);
-        tray->setToolTip(tooltip);
-        tray->show();
-        return tray;
-    }
-}
-
-struct FileBookmarkItem
-{
-    QString uri_path;
-    QString brief;
-    QString description;
-
-    FileBookmarkItem(){}
-    FileBookmarkItem(QString uri_path, QString brief, QString description):
-        uri_path(uri_path), brief(brief), description(description)
-    {}
-};
-
-class FileBookmarkItemModel: public RecordTableModel<FileBookmarkItem>
-{
-public:
-
-    FileBookmarkItemModel(){}
-
-    explicit FileBookmarkItemModel(QWidget* parent)
-        : RecordTableModel<FileBookmarkItem>(parent)
-    {
-    }
-
-    // Constant
-    int column_count() const override { return 3; }
-
-    // Provide column name
-    QString
-    column_name(int column) const override
-    {
-        if(column == 0) { return "Type";     }
-        if(column == 1) { return "File/URI"; }
-        if(column == 2) { return "Path";     }
-        return QString{};
-    }
-
-    // All columns are not editable by the user in the TableView, although
-    // items can be modified by changing the model in the code.
-    bool is_column_editable(int column) const override
-    {
-        return false;
-    }
-
-    /** Sets how all columns of a given item at a given row is displayed.
-     */
-    QString
-    display_item_row(FileBookmarkItem const& item, int column) const override
-    {
-        // Check whether URI string is file or an URL, FTP ...
-        auto is_uri_file = [](QString const& uri_str)
-        {
-            return not( uri_str.startsWith("http://")
-                       || uri_str.startsWith("https://")
-                       || uri_str.startsWith("ftp://"));
-        };
-
-#if 1
-        QString file_name = item.uri_path;
-        QString file_path;
-        QString item_type = "url";
-
-        if(is_uri_file(item.uri_path))
-        {
-            auto info = QFileInfo{item.uri_path};
-            file_name = info.fileName();
-            file_path = info.absolutePath();
-            item_type = "file";
-        }
-        if(column == 0) return item_type;
-        if(column == 1) return file_name;
-        if(column == 2) return file_path;;
-#endif
-
-#if 0
-        if(column == 0) return item.uri_path;
-        if(column == 1) return item.brief;
-        if(column == 2) return item.description;
-#endif
-
-        return QString("<EMPTY>");
-    }
-
-    bool
-    set_element(int column, QVariant value, FileBookmarkItem& item) override
-    {
-        if(column == 0){
-            item.uri_path = value.toString();
-            return true;
-        }
-        if(column == 1){
-            item.brief = value.toString();
-            return true;
-        }
-        if(column == 2){
-            item.description = value.toString();
-            return true;
-        }
-        return false;
-    }
-
-
-};
-
-
-class ApplicationLauncher: public QMainWindow
+class AppMainWindow: public QMainWindow
 {
 private:
     FormLoader   loader;
     QWidget*     form;
-    // Extract children widgets from from file
-    QLineEdit*   cmd_input;
-    QCheckBox*   chb_editable;
-    QCheckBox*   chb_always_on_top;
-    QListWidget* app_registry;
-
-    //======= Tab - Desktop Capture - Widgets =======//
-    QWidget*     tab_file_bookmarks;
-    QTableView*  tview_disp;
-    FileBookmarkItemModel* tview_model;
 
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
 
+    std::unique_ptr<Tab_DesktopBookmarks>    tab_deskbookmarks;
+    std::unique_ptr<Tab_ApplicationLauncher> tab_applauncher;
+
 public:
 
 
-    ApplicationLauncher()
+    AppMainWindow()
         : loader{FormLoader(this, ":/assets/user_interface.ui")}
     {
-
         form = loader.GetForm();
-
-        //========= Tab - Application Launcher ==============///
-
-        // Load controls named in the form "user_interface.ui"
-        cmd_input         = loader.find_child<QLineEdit>("cmd_input");
-        app_registry      = loader.find_child<QListWidget>("cmd_registry");
-        chb_editable      = loader.find_child<QCheckBox>("chb_editable");
-        chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
-
-        //========= Tab - File Bookmark =================//
-
-        tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
-
-        tview_disp = loader.find_child<QTableView>("tview_disp");
-        tview_disp->horizontalHeader()->setStretchLastSection(true);
-        tview_disp->verticalHeader()->hide();
-        tview_disp->setSelectionMode(QTableView::SingleSelection);
-        tview_disp->setSelectionBehavior(QTableView::SelectRows);
-        tview_disp->setDragDropMode(QTableView::InternalMove);
-        tview_disp->setShowGrid(false);
-        tview_disp->setSortingEnabled(true);
-
-        tview_model = new FileBookmarkItemModel(this);
-        tview_disp->setModel(tview_model);
-
-        // Only works after the model is set
-        // Hide path column
-        tview_disp->setColumnHidden(2, true);
-
-        auto entry_ftype = loader.find_child<QLineEdit>("entry_file_type");
-        entry_ftype->setReadOnly(true);
-        auto entry_fname = loader.find_child<QLineEdit>("entry_file_name");
-        entry_fname->setReadOnly(true);
-        auto entry_fpath = loader.find_child<QLineEdit>("entry_file_path");
-        entry_fpath->setReadOnly(true);
-
-        QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
-        mapper->setModel(tview_model);
-        mapper->addMapping(entry_ftype, 0, "text");
-        mapper->addMapping(entry_fname, 1, "text");
-        mapper->addMapping(entry_fpath, 2, "text");
-        mapper->toFirst();
-
-        // Event triggered when the selection of current row is changed.
-        QObject::connect(tview_disp->selectionModel(),
-                         &QItemSelectionModel::currentRowChanged,
-                         [=](QModelIndex i1, QModelIndex i2)
-                         {
-                             std::cout << " [TRACE] Selection changed to index = "
-                                       << i1.row() << std::endl;
-                             mapper->setCurrentModelIndex(i1);
-                         });
-
-        // Update all widgets whenever a new selection iof QTableView changes
-
+        tab_applauncher   = std::make_unique<Tab_ApplicationLauncher>(this, &loader);
+        tab_deskbookmarks = std::make_unique<Tab_DesktopBookmarks>(this, &loader);
 
         //========= Create Tray Icon =======================//
 
@@ -283,70 +89,7 @@ public:
 
         // Enable Drag and Drop Event
         this->setAcceptDrops(true);
-        // tab_file_bookmarks->setAcceptDrops(true);
-        // tview_disp->setAcceptDrops(true);
-        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");       
 
-        // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
-        loader.on_clicked<QCheckBox>("chb_always_on_top",
-                                     [&self = *this]
-                                     {
-                                #if 1
-                                         QMessageBox::warning( &self
-                                                              , "Error report"
-                                                              , "Functionality not implemented yet."
-                                                              );
-                                #endif
-                                // static auto flags = self.windowFlags();
-                                // flags ^=  Qt::WindowStaysOnTopHint;
-                                // self.show();
-                                // self.activateWindow();
-                                 });
-
-        loader.on_button_clicked("btn_add", [&self = *this]
-                                 {
-                                     auto text = self.cmd_input->text();
-                                     if(text.isEmpty()) { return; }
-                                     auto item = new QListWidgetItem();
-                                     item->setText(text);
-                                     self.app_registry->insertItem(0, item);
-                                     self.cmd_input->clear();
-                                     self.save_settings();
-                                 });
-        // qtutils::on_clicked(btn_add,);
-
-        // Signals and slots with member function pointer
-        // QObject::connect(btn_remove, &QPushButton::clicked, this, &CustomerForm::Reset);
-
-        // Signals and slots with lambda function
-        loader.on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
-
-
-        // Launch application double clicked application from registry (QListWidget)
-        qtutils::on_double_clicked(app_registry, [&self = *this]
-                                   {
-                                       if(self.chb_editable->isChecked())
-                                       {
-                                           auto item = self.app_registry->currentItem();
-                                           if(item == nullptr) { return; }
-                                           // Set item as editable
-                                           item->setFlags( item->flags() | Qt::ItemIsEditable);
-                                           self.save_settings();
-                                           return;
-                                       }
-                                       self.run_selected_item();
-                                       // auto command = items.first()->text();
-                                   });
-
-        loader.on_button_clicked("btn_remove",
-                                 [&self = *this]
-                                 {
-                                     QListWidgetItem* pItem = self.app_registry->currentItem();
-                                     if(pItem == nullptr) { return; }
-                                     self.app_registry->removeItemWidget(pItem);
-                                     delete pItem;
-                                     self.save_settings();
-                                 });
 
 
         // Save application state when the main Window is destroyed
@@ -356,68 +99,14 @@ public:
                              std::cout << " [INFO] Window closed Ok" << std::endl;
                          });
 
-        // =========== Event Handlers of Bookmark Table =========//
-
-        loader.on_button_clicked( "btn_add_file", this
-                                 , &ApplicationLauncher::add_bookmark_file);
-
-
-        loader.on_button_clicked( "btn_open_file", this
-                                 , &ApplicationLauncher::open_selected_bookmark_file );
-
-        // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
-#if 1
-        loader.on_double_clicked<QTableView>( "tview_disp", this
-                                              , &ApplicationLauncher::open_selected_bookmark_file);
-#endif
-
-        loader.on_button_clicked("btn_remove_file", this
-                                 , &ApplicationLauncher::remove_selected_bookmark_file);
-
-
-
-
-        //================= Uitility Buttons =========================//
-
-        auto open_stdpath = [](QStandardPaths::StandardLocation p)
-        {
-            auto path = "file://" + QStandardPaths::standardLocations(p).at(0);
-            QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
-        };
-
-        loader.on_button_clicked("btn_open_home",
-                                 std::bind(open_stdpath, QStandardPaths::HomeLocation));
-
-        loader.on_button_clicked("btn_open_docs",
-                                 std::bind(open_stdpath, QStandardPaths::DocumentsLocation));
-
-        loader.on_button_clicked("btn_open_desktop",
-                                 std::bind(open_stdpath, QStandardPaths::DesktopLocation));
-
-        loader.on_button_clicked("btn_open_fonts",
-                                 std::bind(open_stdpath, QStandardPaths::FontsLocation));
-
 
     } // --- End of CustomerForm ctor ------//
 
-    // Run item selected in the QListWidget (ApplicationRegistry)
-    void run_selected_item()
-    {
-        auto& self = *this;
-        auto items = self.app_registry->selectedItems();
-        if(items.isEmpty()) { return; }
-        auto command = items.first()->text();
-
-        bool status = QProcess::startDetached(command);
-
-        std::cout << " [INFO] Run command " << command.toStdString()
-                  << " status = " << (status ? "OK" : "FAILURE")
-                  << std::endl;
-    }
-
+#if 0
     // See: https://stackoverflow.com/questions/18934964
     bool eventFilter(QObject* object, QEvent* event) override
     {
+
         if(object == this->app_registry && event->type() == QEvent::KeyRelease)
         {
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
@@ -429,6 +118,7 @@ public:
         }
         return false;
     }
+#endif
 
     /// Make this window stay alwys on top
     void setWindowAlwaysOnTop()
@@ -499,15 +189,17 @@ public:
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         auto commands = settings.value("commands/list").toStringList();
         for(auto const& cmd: commands){
-            this->app_registry->addItem(cmd);
+            this->tab_applauncher->add_item(cmd);
+            //this->app_registry->addItem(cmd);
         }
 
         auto files_bookmarks = settings.value("files_bookmarks/list")
                                    .toStringList();
-
+#if 1
         for(auto const& file: files_bookmarks){
-            this->tview_model->add_item({file, "", ""});
+            this->tab_deskbookmarks->add_model_entry(file, "", "");
         }
+#endif
 
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
     }
@@ -515,31 +207,31 @@ public:
     /// Save application state
     void save_settings()
     {
+#if 1
         auto settings_file = this->get_settings_file();
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         QStringList list;
-        for(int i = 0; i < this->app_registry->count(); i++)
+        for(int i = 0; i < this->tab_applauncher->count(); i++)
         {
-            QListWidgetItem* item = this->app_registry->item(i);
+            QListWidgetItem* item = this->tab_applauncher->at(i);
             list << item->text();
         }
         settings.setValue("commands/list", list);
 
         QStringList file_bookmarks;
-        for(int i = 0; i < tview_model->count(); ++i)
+        for(int i = 0; i < tab_deskbookmarks->count(); ++i)
         {
-            file_bookmarks << tview_model->at(i).uri_path;
+            file_bookmarks << tab_deskbookmarks->at(i).uri_path;
         }
         settings.setValue("files_bookmarks/list", file_bookmarks);
-
         settings.sync();
+#endif
     }
 
     void dragEnterEvent(QDragEnterEvent* event) override
     {
-        // if(event->source() != this->tab_file_bookmarks) return;
-
-        if(this->tab_file_bookmarks->isVisible())
+#if 1
+        if(this->tab_deskbookmarks->is_visible())
         {
             const QMimeData* mimeData = event->mimeData();
             std::cout << "Drag Event" << std::endl;
@@ -555,62 +247,11 @@ public:
 
             std::cout << " [TRACE] Dragged file: " << path.toStdString() << "\n";
             // this->tview_disp->addItem(path);
-            this->tview_model->add_item({path, "", ""});
+            this->tab_deskbookmarks->add_model_entry(path, "", "");
             this->save_settings();
         }
-
-    }
-
-    /// Open bookmark file in the Desktop Bookmark Tab
-    void open_selected_bookmark_file()
-    {
-
-#if 1
-        auto& self = *this;
-        auto index = tview_disp->currentIndex();
-
-        if(!index.isValid()) { return ; }
-
-        auto item  = tview_model->at(index.row());
-
-        auto file = item.uri_path;
-        std::cout << " [INFO] Open file " << file.toStdString() << "\n";
-        // Linux-only for a while
-
-        auto file_uri_string = [&]
-        {
-            if(file.startsWith("http:") || file.startsWith("https:")
-                ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
-                return file;
-            return "file://" + file;
-        }();
-        QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
 #endif
 
-    }
-
-    void remove_selected_bookmark_file()
-    {
-
-        // QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED();
-        auto& self = *this;
-        auto index = self.tview_disp->currentIndex();
-        // Abort on error
-        if(!index.isValid()) { return; }
-        // QListWidgetItem* pItem = self.tview_disp->currentItem();
-        self.tview_model->remove_item(index.row());
-        self.save_settings();
-    }
-
-    void add_bookmark_file()
-    {
-        auto& self = *this;
-        QString file = QFileDialog::getOpenFileName(
-            &self, "Open File", ".");
-        std::cout << " [INFO] Selected file = "
-                  << file.toStdString() << std::endl;
-        self.tview_model->add_item({file, "", ""});
-        self.save_settings();
     }
 
 };
@@ -623,7 +264,7 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setApplicationName("qapplauncher");   
 
-    ApplicationLauncher maingui;
+    AppMainWindow maingui;
     maingui.setWindowIcon(QIcon(":/assets/appicon.png"));
     maingui.showNormal();
 

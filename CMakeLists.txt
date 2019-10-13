@@ -35,8 +35,26 @@ endfunction()
 
 add_executable( applauncher
                 main.cpp
+
+                tab_desktopbookmarks.cpp
+                tab_desktopbookmarks.hpp
+
+                # Class Tab_ApplicationLauncher
+                tab_applicationlauncher.cpp
+                tab_applicationlauncher.hpp
+
+                # QT Utilities
+                qtutils.hpp
                 RecordTableModel.hpp
                 FormLoader.hpp
+
+                # Class FileBookMarkItem
+                FileBookmarkItem.hpp
+
+                # Class: FileBookMarkItemModel
+                filebookmarkitemmodel.cpp
+                filebookmarkitemmodel.hpp
+
                 resources.qrc
                )           
 copy_after_build( applauncher )
