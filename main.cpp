@@ -658,7 +658,7 @@ public:
 
             std::cout << " [TRACE] Dragged file: " << path.toStdString() << "\n";
             // this->tview_disp->addItem(path);
-            this->tview_model->add_item({path, "", ""});
+            this->tab_deskbookmarks->add_model_entry(path, "", "");
             this->save_settings();
         }
 #endif
