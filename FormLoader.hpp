@@ -7,6 +7,7 @@
 #include <QSysInfo>
 #include <QtConcurrent/QtConcurrent>
 
+#include <cassert>
 #include <string>
 
 /**
