@@ -19,6 +19,7 @@ private:
     QWidget* form;
     QWidget* m_parent;
 public:
+
     FormLoader(QMainWindow* parent, QString path)
     {
         m_parent = parent;
@@ -63,17 +64,11 @@ public:
     template<typename T>
     T* find_child(QString widget_name)
     {
-        T* p_widget = form->findChild<T*>(widget_name);
+        T* widget = form->findChild<T*>(widget_name);
         // Throws exception if widget is not found in order to
         // make the failure easier to trace.
-        if(p_widget == nullptr)
-        {
-            using namespace std::string_literals;
-            throw std::runtime_error("Error: Unable to load widget named: <"s
-                                     + widget_name.toStdString()
-                                     + "> from the form file "s + formFile.toStdString());
-        }
-        return p_widget;
+        this->ensure_widget_loaded(widget, widget_name);
+        return widget;
     }
 
     /// Types that models Sender type concept: QPushButton, QCheckBox
@@ -81,12 +76,7 @@ public:
     void on_clicked(QString widget_name, Callback&& event_handler)
     {
         Sender* pSender = form->findChild<Sender*>(widget_name);
-        if(pSender == nullptr){
-            using namespace std::string_literals;
-            throw std::runtime_error("Error: Unable to load widget named: <"s
-                                     + widget_name.toStdString()
-                                     + "> from the form file "s + formFile.toStdString());
-        }
+        this->ensure_widget_loaded(pSender, widget_name);
         QObject::connect(pSender, &Sender::clicked, event_handler);
     }
 
@@ -94,12 +84,7 @@ public:
     void on_clicked(QString widget_name, Receiver pReceiver, Method&& receiver_method)
     {
         Sender* pSender = form->findChild<Sender*>(widget_name);
-        if(pSender == nullptr){
-            using namespace std::string_literals;
-            throw std::runtime_error("Error: Unable to load widget named: <"s
-                                     + widget_name.toStdString()
-                                     + "> from the form file "s + formFile.toStdString());
-        }
+        this->ensure_widget_loaded(pSender, widget_name);
         QObject::connect(pSender, &Sender::clicked, pReceiver, receiver_method);
     }
 
@@ -121,7 +106,7 @@ public:
     void on_double_clicked(QString widget_name, Callback&& event_handler)
     {
         Sender* pSender = form->findChild<Sender*>(widget_name);
-        assert(pSender != nullptr);
+        this->ensure_widget_loaded(pSender, widget_name);
         QObject::connect(pSender, &Sender::doubleClicked, event_handler);
     }
 
@@ -137,6 +122,21 @@ public:
                                      + "> from the form file "s + formFile.toStdString());
         }
         QObject::connect(pSender, &Sender::doubleClicked, pReceiver, receiver_method);
+    }
+
+private:
+
+    /** Ensure that widget was loaded from XML. Throws exception if the widget
+     *  cannot be found in the form file.
+     * This function makes the error diagnosing easier.
+     */
+    void ensure_widget_loaded(QWidget* widget, QString widget_name)
+    {
+        if(widget != nullptr) { return; }
+        using namespace std::string_literals;
+        throw std::runtime_error("Error: Unable to load widget named: <"s
+                                 + widget_name.toStdString()
+                                 + "> from the form file "s + formFile.toStdString());
     }
 
 };
