@@ -200,24 +200,35 @@ public:
         //========= Tab - File Bookmark =================//
 
         tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
+
         tview_disp = loader.find_child<QTableView>("tview_disp");
+        tview_disp->horizontalHeader()->setStretchLastSection(true);
+        tview_disp->verticalHeader()->hide();
         tview_disp->setSelectionMode(QTableView::SingleSelection);
         tview_disp->setSelectionBehavior(QTableView::SelectRows);
         tview_disp->setDragDropMode(QTableView::InternalMove);
         tview_disp->setShowGrid(false);
+        tview_disp->setSortingEnabled(true);
 
         tview_model = new FileBookmarkItemModel(this);
         tview_disp->setModel(tview_model);
 
+        // Only works after the model is set
+        // Hide path column
+        tview_disp->setColumnHidden(2, true);
 
-        auto entry_filename  = loader.find_child<QLineEdit>("entry_filename");
-        auto entry_filetitle = loader.find_child<QLineEdit>("entry_filetitle");
-        auto entry_filedesc  = loader.find_child<QLineEdit>("entry_filedesc");
+        auto entry_ftype = loader.find_child<QLineEdit>("entry_file_type");
+        entry_ftype->setReadOnly(true);
+        auto entry_fname = loader.find_child<QLineEdit>("entry_file_name");
+        entry_fname->setReadOnly(true);
+        auto entry_fpath = loader.find_child<QLineEdit>("entry_file_path");
+        entry_fpath->setReadOnly(true);
 
         QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
         mapper->setModel(tview_model);
-        mapper->addMapping(entry_filename,  0, "text");
-        mapper->addMapping(entry_filetitle, 1, "text");
+        mapper->addMapping(entry_ftype, 0, "text");
+        mapper->addMapping(entry_fname, 1, "text");
+        mapper->addMapping(entry_fpath, 2, "text");
         mapper->toFirst();
 
         // Event triggered when the selection of current row is changed.
