@@ -278,6 +278,18 @@ public:
         this->tview_model->add_item({uri_path, brief, description});
     }
 
+    // Return item at Nth row of model
+    FileBookmarkItem&
+    at(int row)
+    {
+        return this->tview_model->at(row);
+    }
+
+    int count() const
+    {
+        return this->tview_model->count();
+    }
+
     /// Open bookmark file in the Desktop Bookmark Tab
     void open_selected_bookmark_file()
     {
@@ -598,7 +610,7 @@ public:
     /// Save application state
     void save_settings()
     {
-#if 0
+#if 1
         auto settings_file = this->get_settings_file();
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         QStringList list;
@@ -610,9 +622,9 @@ public:
         settings.setValue("commands/list", list);
 
         QStringList file_bookmarks;
-        for(int i = 0; i < tview_model->count(); ++i)
+        for(int i = 0; i < tab_deskbookmarks->count(); ++i)
         {
-            file_bookmarks << tview_model->at(i).uri_path;
+            file_bookmarks << tab_deskbookmarks->at(i).uri_path;
         }
         settings.setValue("files_bookmarks/list", file_bookmarks);
         settings.sync();
