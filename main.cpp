@@ -366,7 +366,7 @@ public:
                                  , &ApplicationLauncher::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
-#if 0
+#if 1
         loader.on_double_clicked<QTableView>( "tview_disp", this
                                               , &ApplicationLauncher::open_selected_bookmark_file);
 #endif
