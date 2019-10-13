@@ -81,17 +81,27 @@ public:
     }
 
     // Constant
-    int column_count() const override { return 2; }
+    int column_count() const override { return 3; }
 
     // Provide column name
     QString
     column_name(int column) const override
     {
-        if(column == 0) { return "File/URI"; }
-        if(column == 1) { return "Path"; }
+        if(column == 0) { return "Type";     }
+        if(column == 1) { return "File/URI"; }
+        if(column == 2) { return "Path";     }
         return QString{};
     }
 
+    // All columns are not editable by the user in the TableView, although
+    // items can be modified by changing the model in the code.
+    bool is_column_editable(int column) const override
+    {
+        return false;
+    }
+
+    /** Sets how all columns of a given item at a given row is displayed.
+     */
     QString
     display_item_row(FileBookmarkItem const& item, int column) const override
     {
@@ -103,20 +113,51 @@ public:
                        || uri_str.startsWith("ftp://"));
         };
 
+#if 1
         QString file_name = item.uri_path;
         QString file_path;
+        QString item_type = "url";
 
         if(is_uri_file(item.uri_path))
         {
             auto info = QFileInfo{item.uri_path};
             file_name = info.fileName();
             file_path = info.absolutePath();
+            item_type = "file";
         }
-        if(column == 0) return file_name;
-        if(column == 1) return file_path;
-        if(column == 2) return "";
-        return QString();
+        if(column == 0) return item_type;
+        if(column == 1) return file_name;
+        if(column == 2) return file_path;;
+#endif
+
+#if 0
+        if(column == 0) return item.uri_path;
+        if(column == 1) return item.brief;
+        if(column == 2) return item.description;
+#endif
+
+        return QString("<EMPTY>");
     }
+
+    bool
+    set_element(int column, QVariant value, FileBookmarkItem& item) override
+    {
+        if(column == 0){
+            item.uri_path = value.toString();
+            return true;
+        }
+        if(column == 1){
+            item.brief = value.toString();
+            return true;
+        }
+        if(column == 2){
+            item.description = value.toString();
+            return true;
+        }
+        return false;
+    }
+
+
 };
 
 
@@ -159,14 +200,49 @@ public:
         //========= Tab - File Bookmark =================//
 
         tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
+
         tview_disp = loader.find_child<QTableView>("tview_disp");
+        tview_disp->horizontalHeader()->setStretchLastSection(true);
+        tview_disp->verticalHeader()->hide();
         tview_disp->setSelectionMode(QTableView::SingleSelection);
         tview_disp->setSelectionBehavior(QTableView::SelectRows);
         tview_disp->setDragDropMode(QTableView::InternalMove);
         tview_disp->setShowGrid(false);
+        tview_disp->setSortingEnabled(true);
 
         tview_model = new FileBookmarkItemModel(this);
         tview_disp->setModel(tview_model);
+
+        // Only works after the model is set
+        // Hide path column
+        tview_disp->setColumnHidden(2, true);
+
+        auto entry_ftype = loader.find_child<QLineEdit>("entry_file_type");
+        entry_ftype->setReadOnly(true);
+        auto entry_fname = loader.find_child<QLineEdit>("entry_file_name");
+        entry_fname->setReadOnly(true);
+        auto entry_fpath = loader.find_child<QLineEdit>("entry_file_path");
+        entry_fpath->setReadOnly(true);
+
+        QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
+        mapper->setModel(tview_model);
+        mapper->addMapping(entry_ftype, 0, "text");
+        mapper->addMapping(entry_fname, 1, "text");
+        mapper->addMapping(entry_fpath, 2, "text");
+        mapper->toFirst();
+
+        // Event triggered when the selection of current row is changed.
+        QObject::connect(tview_disp->selectionModel(),
+                         &QItemSelectionModel::currentRowChanged,
+                         [=](QModelIndex i1, QModelIndex i2)
+                         {
+                             std::cout << " [TRACE] Selection changed to index = "
+                                       << i1.row() << std::endl;
+                             mapper->setCurrentModelIndex(i1);
+                         });
+
+        // Update all widgets whenever a new selection iof QTableView changes
+
 
         //========= Create Tray Icon =======================//
 
@@ -290,11 +366,15 @@ public:
                                  , &ApplicationLauncher::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
+#if 1
         loader.on_double_clicked<QTableView>( "tview_disp", this
                                               , &ApplicationLauncher::open_selected_bookmark_file);
+#endif
 
         loader.on_button_clicked("btn_remove_file", this
                                  , &ApplicationLauncher::remove_selected_bookmark_file);
+
+
 
 
         //================= Uitility Buttons =========================//
