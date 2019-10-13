@@ -37,6 +37,11 @@ add_executable( applauncher
                 main.cpp
                 RecordTableModel.hpp
                 FormLoader.hpp
+
+                # Class Tab_ApplicationLauncher
+                tab_applicationlauncher.cpp
+                tab_applicationlauncher.hpp
+
                 resources.qrc
                )           
 copy_after_build( applauncher )
