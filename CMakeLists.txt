@@ -41,9 +41,16 @@ add_executable( applauncher
                 RecordTableModel.hpp
                 FormLoader.hpp
 
+                # Class FileBookMarkItem
+                FileBookmarkItem.hpp
+
                 # Class Tab_ApplicationLauncher
                 tab_applicationlauncher.cpp
                 tab_applicationlauncher.hpp
+
+                # Class: FileBookMarkItemModel
+                filebookmarkitemmodel.cpp
+                filebookmarkitemmodel.hpp
 
                 resources.qrc
                )           
