@@ -8,6 +8,7 @@
 #include <functional>
 #include <cassert>
 #include <sstream>
+#include <memory>
 
 #include <QtWidgets>
 #include <QApplication>
@@ -163,7 +164,7 @@ public:
 
 class Tab_DesktopBookmarks
 {
-    FormLoader& loader;
+    FormLoader* loader;
 
     //======= Tab - Desktop Capture - Widgets =======//
     QWidget*               parent;
@@ -172,14 +173,14 @@ class Tab_DesktopBookmarks
     FileBookmarkItemModel* tview_model;
 public:
 
-    Tab_DesktopBookmarks(QWidget* parent, FormLoader& loader):
+    Tab_DesktopBookmarks(QWidget* parent, FormLoader* loader):
         parent(parent), loader{loader}
     {
         //========= Tab - File Bookmark =================//
 
-        tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
+        tab_file_bookmarks = loader->find_child<QWidget>("tab_file_bookmarks");
 
-        tview_disp = loader.find_child<QTableView>("tview_disp");
+        tview_disp = loader->find_child<QTableView>("tview_disp");
         tview_disp->horizontalHeader()->setStretchLastSection(true);
         tview_disp->verticalHeader()->hide();
         tview_disp->setSelectionMode(QTableView::SingleSelection);
@@ -197,11 +198,11 @@ public:
         // Hide path column
         tview_disp->setColumnHidden(2, true);
 
-        auto entry_ftype = loader.find_child<QLineEdit>("entry_file_type");
+        auto entry_ftype = loader->find_child<QLineEdit>("entry_file_type");
         entry_ftype->setReadOnly(true);
-        auto entry_fname = loader.find_child<QLineEdit>("entry_file_name");
+        auto entry_fname = loader->find_child<QLineEdit>("entry_file_name");
         entry_fname->setReadOnly(true);
-        auto entry_fpath = loader.find_child<QLineEdit>("entry_file_path");
+        auto entry_fpath = loader->find_child<QLineEdit>("entry_file_path");
         entry_fpath->setReadOnly(true);
 
         auto mapper = new QDataWidgetMapper(parent);
@@ -225,22 +226,22 @@ public:
 
         // =========== Event Handlers of Bookmark Table =========//
 
-        loader.on_button_clicked( "btn_add_file",
+        loader->on_button_clicked( "btn_add_file",
                                  std::bind(&Tab_DesktopBookmarks::add_bookmark_file, this));
 
 
-        loader.on_button_clicked( "btn_open_file",
+        loader->on_button_clicked( "btn_open_file",
                                  std::bind(&Tab_DesktopBookmarks::open_selected_bookmark_file, this));
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
 #if 1
-        loader.on_double_clicked<QTableView>( "tview_disp",
+        loader->on_double_clicked<QTableView>( "tview_disp",
                                              [this]{
                                                  this->open_selected_bookmark_file();
                                              });
 #endif
 
-        loader.on_button_clicked(
+        loader->on_button_clicked(
             "btn_remove_file",
             std::bind(&Tab_DesktopBookmarks::remove_selected_bookmark_file, this));
 
@@ -254,20 +255,23 @@ public:
             QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
         };
 
-        loader.on_button_clicked("btn_open_home",
+        loader->on_button_clicked("btn_open_home",
                                  std::bind(open_stdpath, QStandardPaths::HomeLocation));
 
-        loader.on_button_clicked("btn_open_docs",
+        loader->on_button_clicked("btn_open_docs",
                                  std::bind(open_stdpath, QStandardPaths::DocumentsLocation));
 
-        loader.on_button_clicked("btn_open_desktop",
+        loader->on_button_clicked("btn_open_desktop",
                                  std::bind(open_stdpath, QStandardPaths::DesktopLocation));
 
-        loader.on_button_clicked("btn_open_fonts",
+        loader->on_button_clicked("btn_open_fonts",
                                  std::bind(open_stdpath, QStandardPaths::FontsLocation));
 
     } //----- End of Tab_DesktopBookmarks constructor ----------//
 
+    // Disable copy-constructor and copy assignment operator
+    Tab_DesktopBookmarks(Tab_DesktopBookmarks const& rhs) = delete;
+    Tab_DesktopBookmarks& operator=(Tab_DesktopBookmarks const& rhs) = delete;
 
     /// Open bookmark file in the Desktop Bookmark Tab
     void open_selected_bookmark_file()
@@ -338,6 +342,9 @@ private:
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
 
+
+    std::unique_ptr<Tab_DesktopBookmarks> tab_deskbookmarks;
+
 public:
 
 
@@ -347,6 +354,9 @@ public:
 
         form = loader.GetForm();
 
+
+        tab_deskbookmarks = std::make_unique<Tab_DesktopBookmarks>(this, &loader);
+
         //========= Tab - Application Launcher ==============///
 
         // Load controls named in the form "user_interface.ui"
@@ -354,8 +364,6 @@ public:
         app_registry      = loader.find_child<QListWidget>("cmd_registry");
         chb_editable      = loader.find_child<QCheckBox>("chb_editable");
         chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
-
-
 
         //========= Create Tray Icon =======================//
 
