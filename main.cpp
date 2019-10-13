@@ -273,6 +273,11 @@ public:
     Tab_DesktopBookmarks(Tab_DesktopBookmarks const& rhs) = delete;
     Tab_DesktopBookmarks& operator=(Tab_DesktopBookmarks const& rhs) = delete;
 
+    void add_model_entry(QString uri_path, QString brief, QString description)
+    {
+        this->tview_model->add_item({uri_path, brief, description});
+    }
+
     /// Open bookmark file in the Desktop Bookmark Tab
     void open_selected_bookmark_file()
     {
@@ -581,9 +586,9 @@ public:
 
         auto files_bookmarks = settings.value("files_bookmarks/list")
                                    .toStringList();
-#if 0
+#if 1
         for(auto const& file: files_bookmarks){
-            this->tview_model->add_item({file, "", ""});
+            this->tab_deskbookmarks->add_model_entry(file, "", "");
         }
 #endif
 
