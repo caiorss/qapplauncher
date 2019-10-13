@@ -278,6 +278,12 @@ public:
         this->tview_model->add_item({uri_path, brief, description});
     }
 
+    // Returns true if this table is visible to the user
+    bool is_visible()
+    {
+        return this->tab_file_bookmarks->isVisible();
+    }
+
     // Return item at Nth row of model
     FileBookmarkItem&
     at(int row)
