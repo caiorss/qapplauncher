@@ -214,8 +214,8 @@ public:
 
         auto open_stdpath = [](QStandardPaths::StandardLocation p)
         {
-            auto path = "file://" + QStandardPaths::standardLocations(p).at(0);
-            QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
+            auto url = QUrl::fromLocalFile(QStandardPaths::standardLocations(p).at(0));
+            QDesktopServices::openUrl(url);
         };
 
         loader->on_button_clicked("btn_open_home",
