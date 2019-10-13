@@ -161,6 +161,168 @@ public:
 };
 
 
+class Tab_DesktopBookmarks
+{
+    FormLoader& loader;
+
+    //======= Tab - Desktop Capture - Widgets =======//
+    QWidget*               parent;
+    QWidget*               tab_file_bookmarks;
+    QTableView*            tview_disp;
+    FileBookmarkItemModel* tview_model;
+public:
+
+    Tab_DesktopBookmarks(QWidget* parent, FormLoader& loader):
+        parent(parent), loader{loader}
+    {
+        //========= Tab - File Bookmark =================//
+
+        tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
+
+        tview_disp = loader.find_child<QTableView>("tview_disp");
+        tview_disp->horizontalHeader()->setStretchLastSection(true);
+        tview_disp->verticalHeader()->hide();
+        tview_disp->setSelectionMode(QTableView::SingleSelection);
+        tview_disp->setSelectionBehavior(QTableView::SelectRows);
+        tview_disp->setDragDropMode(QTableView::InternalMove);
+        tview_disp->setShowGrid(false);
+        tview_disp->setSortingEnabled(true);
+        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");
+
+
+        tview_model = new FileBookmarkItemModel(parent);
+        tview_disp->setModel(tview_model);
+
+        // Only works after the model is set
+        // Hide path column
+        tview_disp->setColumnHidden(2, true);
+
+        auto entry_ftype = loader.find_child<QLineEdit>("entry_file_type");
+        entry_ftype->setReadOnly(true);
+        auto entry_fname = loader.find_child<QLineEdit>("entry_file_name");
+        entry_fname->setReadOnly(true);
+        auto entry_fpath = loader.find_child<QLineEdit>("entry_file_path");
+        entry_fpath->setReadOnly(true);
+
+        auto mapper = new QDataWidgetMapper(parent);
+        mapper->setModel(tview_model);
+        mapper->addMapping(entry_ftype, 0, "text");
+        mapper->addMapping(entry_fname, 1, "text");
+        mapper->addMapping(entry_fpath, 2, "text");
+        mapper->toFirst();
+
+        // Event triggered when the selection of current row is changed.
+        QObject::connect(tview_disp->selectionModel(),
+                         &QItemSelectionModel::currentRowChanged,
+                         [=](QModelIndex i1, QModelIndex i2)
+                         {
+                             std::cout << " [TRACE] Selection changed to index = "
+                                       << i1.row() << std::endl;
+                             mapper->setCurrentModelIndex(i1);
+                         });
+
+        // Update all widgets whenever a new selection iof QTableView changes
+
+        // =========== Event Handlers of Bookmark Table =========//
+
+        loader.on_button_clicked( "btn_add_file",
+                                 std::bind(&Tab_DesktopBookmarks::add_bookmark_file, this));
+
+
+        loader.on_button_clicked( "btn_open_file",
+                                 std::bind(&Tab_DesktopBookmarks::open_selected_bookmark_file, this));
+
+        // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
+#if 1
+        loader.on_double_clicked<QTableView>( "tview_disp",
+                                             [this]{
+                                                 this->open_selected_bookmark_file();
+                                             });
+#endif
+
+        loader.on_button_clicked(
+            "btn_remove_file",
+            std::bind(&Tab_DesktopBookmarks::remove_selected_bookmark_file, this));
+
+
+
+        //================= Uitility Buttons =========================//
+
+        auto open_stdpath = [](QStandardPaths::StandardLocation p)
+        {
+            auto path = "file://" + QStandardPaths::standardLocations(p).at(0);
+            QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
+        };
+
+        loader.on_button_clicked("btn_open_home",
+                                 std::bind(open_stdpath, QStandardPaths::HomeLocation));
+
+        loader.on_button_clicked("btn_open_docs",
+                                 std::bind(open_stdpath, QStandardPaths::DocumentsLocation));
+
+        loader.on_button_clicked("btn_open_desktop",
+                                 std::bind(open_stdpath, QStandardPaths::DesktopLocation));
+
+        loader.on_button_clicked("btn_open_fonts",
+                                 std::bind(open_stdpath, QStandardPaths::FontsLocation));
+
+    } //----- End of Tab_DesktopBookmarks constructor ----------//
+
+
+    /// Open bookmark file in the Desktop Bookmark Tab
+    void open_selected_bookmark_file()
+    {
+
+#if 1
+        auto& self = *this;
+        auto index = tview_disp->currentIndex();
+
+        if(!index.isValid()) { return ; }
+
+        auto item  = tview_model->at(index.row());
+
+        auto file = item.uri_path;
+        std::cout << " [INFO] Open file " << file.toStdString() << "\n";
+        // Linux-only for a while
+
+        auto file_uri_string = [&]
+        {
+            if(file.startsWith("http:") || file.startsWith("https:")
+                ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
+                return file;
+            return "file://" + file;
+        }();
+        QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
+#endif
+    }
+
+    void remove_selected_bookmark_file()
+    {
+
+        // QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED();
+        auto& self = *this;
+        auto index = self.tview_disp->currentIndex();
+        // Abort on error
+        if(!index.isValid()) { return; }
+        // QListWidgetItem* pItem = self.tview_disp->currentItem();
+        self.tview_model->remove_item(index.row());
+
+        // self.save_settings();
+    }
+
+    void add_bookmark_file()
+    {
+        QString file = QFileDialog::getOpenFileName(parent, "Open File", ".");
+        std::cout << " [INFO] Selected file = "
+                  << file.toStdString() << std::endl;
+        this->tview_model->add_item({file, "", ""});
+        // self.save_settings();
+    }
+
+
+}; //----- End of class DesktopBookmarksTable ---------//
+
+
 class AppMainWindow: public QMainWindow
 {
 private:
@@ -172,10 +334,6 @@ private:
     QCheckBox*   chb_always_on_top;
     QListWidget* app_registry;
 
-    //======= Tab - Desktop Capture - Widgets =======//
-    QWidget*     tab_file_bookmarks;
-    QTableView*  tview_disp;
-    FileBookmarkItemModel* tview_model;
 
     //======== TrayIcon =============================//
     QSystemTrayIcon* tray_icon;
@@ -197,51 +355,6 @@ public:
         chb_editable      = loader.find_child<QCheckBox>("chb_editable");
         chb_always_on_top = loader.find_child<QCheckBox>("chb_always_on_top");
 
-        //========= Tab - File Bookmark =================//
-
-        tab_file_bookmarks = loader.find_child<QWidget>("tab_file_bookmarks");
-
-        tview_disp = loader.find_child<QTableView>("tview_disp");
-        tview_disp->horizontalHeader()->setStretchLastSection(true);
-        tview_disp->verticalHeader()->hide();
-        tview_disp->setSelectionMode(QTableView::SingleSelection);
-        tview_disp->setSelectionBehavior(QTableView::SelectRows);
-        tview_disp->setDragDropMode(QTableView::InternalMove);
-        tview_disp->setShowGrid(false);
-        tview_disp->setSortingEnabled(true);
-
-        tview_model = new FileBookmarkItemModel(this);
-        tview_disp->setModel(tview_model);
-
-        // Only works after the model is set
-        // Hide path column
-        tview_disp->setColumnHidden(2, true);
-
-        auto entry_ftype = loader.find_child<QLineEdit>("entry_file_type");
-        entry_ftype->setReadOnly(true);
-        auto entry_fname = loader.find_child<QLineEdit>("entry_file_name");
-        entry_fname->setReadOnly(true);
-        auto entry_fpath = loader.find_child<QLineEdit>("entry_file_path");
-        entry_fpath->setReadOnly(true);
-
-        QDataWidgetMapper* mapper = new QDataWidgetMapper(this);
-        mapper->setModel(tview_model);
-        mapper->addMapping(entry_ftype, 0, "text");
-        mapper->addMapping(entry_fname, 1, "text");
-        mapper->addMapping(entry_fpath, 2, "text");
-        mapper->toFirst();
-
-        // Event triggered when the selection of current row is changed.
-        QObject::connect(tview_disp->selectionModel(),
-                         &QItemSelectionModel::currentRowChanged,
-                         [=](QModelIndex i1, QModelIndex i2)
-                         {
-                             std::cout << " [TRACE] Selection changed to index = "
-                                       << i1.row() << std::endl;
-                             mapper->setCurrentModelIndex(i1);
-                         });
-
-        // Update all widgets whenever a new selection iof QTableView changes
 
 
         //========= Create Tray Icon =======================//
@@ -283,9 +396,6 @@ public:
 
         // Enable Drag and Drop Event
         this->setAcceptDrops(true);
-        // tab_file_bookmarks->setAcceptDrops(true);
-        // tview_disp->setAcceptDrops(true);
-        tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");       
 
         // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
         loader.on_clicked<QCheckBox>("chb_always_on_top",
@@ -355,47 +465,6 @@ public:
                              this->save_window_settings();
                              std::cout << " [INFO] Window closed Ok" << std::endl;
                          });
-
-        // =========== Event Handlers of Bookmark Table =========//
-
-        loader.on_button_clicked( "btn_add_file", this
-                                 , &AppMainWindow::add_bookmark_file);
-
-
-        loader.on_button_clicked( "btn_open_file", this
-                                 , &AppMainWindow::open_selected_bookmark_file );
-
-        // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
-#if 1
-        loader.on_double_clicked<QTableView>( "tview_disp", this
-                                              , &AppMainWindow::open_selected_bookmark_file);
-#endif
-
-        loader.on_button_clicked("btn_remove_file", this
-                                 , &AppMainWindow::remove_selected_bookmark_file);
-
-
-
-
-        //================= Uitility Buttons =========================//
-
-        auto open_stdpath = [](QStandardPaths::StandardLocation p)
-        {
-            auto path = "file://" + QStandardPaths::standardLocations(p).at(0);
-            QDesktopServices::openUrl(QUrl(path, QUrl::TolerantMode));
-        };
-
-        loader.on_button_clicked("btn_open_home",
-                                 std::bind(open_stdpath, QStandardPaths::HomeLocation));
-
-        loader.on_button_clicked("btn_open_docs",
-                                 std::bind(open_stdpath, QStandardPaths::DocumentsLocation));
-
-        loader.on_button_clicked("btn_open_desktop",
-                                 std::bind(open_stdpath, QStandardPaths::DesktopLocation));
-
-        loader.on_button_clicked("btn_open_fonts",
-                                 std::bind(open_stdpath, QStandardPaths::FontsLocation));
 
 
     } // --- End of CustomerForm ctor ------//
@@ -504,10 +573,11 @@ public:
 
         auto files_bookmarks = settings.value("files_bookmarks/list")
                                    .toStringList();
-
+#if 0
         for(auto const& file: files_bookmarks){
             this->tview_model->add_item({file, "", ""});
         }
+#endif
 
         std::cout << " [INFO] Settings loaded Ok." << std::endl;
     }
@@ -515,6 +585,7 @@ public:
     /// Save application state
     void save_settings()
     {
+#if 0
         auto settings_file = this->get_settings_file();
         auto settings = QSettings(settings_file, QSettings::IniFormat);
         QStringList list;
@@ -531,14 +602,15 @@ public:
             file_bookmarks << tview_model->at(i).uri_path;
         }
         settings.setValue("files_bookmarks/list", file_bookmarks);
-
         settings.sync();
+#endif
     }
 
     void dragEnterEvent(QDragEnterEvent* event) override
     {
         // if(event->source() != this->tab_file_bookmarks) return;
 
+#if 0
         if(this->tab_file_bookmarks->isVisible())
         {
             const QMimeData* mimeData = event->mimeData();
@@ -558,59 +630,8 @@ public:
             this->tview_model->add_item({path, "", ""});
             this->save_settings();
         }
-
-    }
-
-    /// Open bookmark file in the Desktop Bookmark Tab
-    void open_selected_bookmark_file()
-    {
-
-#if 1
-        auto& self = *this;
-        auto index = tview_disp->currentIndex();
-
-        if(!index.isValid()) { return ; }
-
-        auto item  = tview_model->at(index.row());
-
-        auto file = item.uri_path;
-        std::cout << " [INFO] Open file " << file.toStdString() << "\n";
-        // Linux-only for a while
-
-        auto file_uri_string = [&]
-        {
-            if(file.startsWith("http:") || file.startsWith("https:")
-                ||  file.startsWith("ftp:") ||  file.startsWith("ftps:"))
-                return file;
-            return "file://" + file;
-        }();
-        QDesktopServices::openUrl(QUrl(file_uri_string, QUrl::TolerantMode));
 #endif
 
-    }
-
-    void remove_selected_bookmark_file()
-    {
-
-        // QSTL_WARNING_FUNCTION_NOT_IMPLEMENTED();
-        auto& self = *this;
-        auto index = self.tview_disp->currentIndex();
-        // Abort on error
-        if(!index.isValid()) { return; }
-        // QListWidgetItem* pItem = self.tview_disp->currentItem();
-        self.tview_model->remove_item(index.row());
-        self.save_settings();
-    }
-
-    void add_bookmark_file()
-    {
-        auto& self = *this;
-        QString file = QFileDialog::getOpenFileName(
-            &self, "Open File", ".");
-        std::cout << " [INFO] Selected file = "
-                  << file.toStdString() << std::endl;
-        self.tview_model->add_item({file, "", ""});
-        self.save_settings();
     }
 
 };
