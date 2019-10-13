@@ -161,7 +161,7 @@ public:
 };
 
 
-class ApplicationLauncher: public QMainWindow
+class AppMainWindow: public QMainWindow
 {
 private:
     FormLoader   loader;
@@ -183,7 +183,7 @@ private:
 public:
 
 
-    ApplicationLauncher()
+    AppMainWindow()
         : loader{FormLoader(this, ":/assets/user_interface.ui")}
     {
 
@@ -359,20 +359,20 @@ public:
         // =========== Event Handlers of Bookmark Table =========//
 
         loader.on_button_clicked( "btn_add_file", this
-                                 , &ApplicationLauncher::add_bookmark_file);
+                                 , &AppMainWindow::add_bookmark_file);
 
 
         loader.on_button_clicked( "btn_open_file", this
-                                 , &ApplicationLauncher::open_selected_bookmark_file );
+                                 , &AppMainWindow::open_selected_bookmark_file );
 
         // qtutils::on_double_clicked(tview_disp, open_selected_bookmark_file);
 #if 1
         loader.on_double_clicked<QTableView>( "tview_disp", this
-                                              , &ApplicationLauncher::open_selected_bookmark_file);
+                                              , &AppMainWindow::open_selected_bookmark_file);
 #endif
 
         loader.on_button_clicked("btn_remove_file", this
-                                 , &ApplicationLauncher::remove_selected_bookmark_file);
+                                 , &AppMainWindow::remove_selected_bookmark_file);
 
 
 
@@ -623,7 +623,7 @@ int main(int argc, char** argv)
     QApplication app(argc, argv);
     app.setApplicationName("qapplauncher");   
 
-    ApplicationLauncher maingui;
+    AppMainWindow maingui;
     maingui.setWindowIcon(QIcon(":/assets/appicon.png"));
     maingui.showNormal();
 
