@@ -35,6 +35,9 @@ endfunction()
 
 add_executable( applauncher
                 main.cpp
+
+                # QT Utilities
+                qtutils.hpp
                 RecordTableModel.hpp
                 FormLoader.hpp
 
