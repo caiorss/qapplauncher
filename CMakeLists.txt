@@ -34,7 +34,11 @@ endfunction()
 #------- Target applauncher ----------------------------#
 
 add_executable( applauncher
+
                 main.cpp
+
+                appmainwindow.cpp
+                appmainwindow.hpp
 
                 tab_desktopbookmarks.cpp
                 tab_desktopbookmarks.hpp
