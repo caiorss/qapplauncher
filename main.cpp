@@ -374,10 +374,7 @@ public:
     AppMainWindow()
         : loader{FormLoader(this, ":/assets/user_interface.ui")}
     {
-
         form = loader.GetForm();
-
-
         tab_deskbookmarks = std::make_unique<Tab_DesktopBookmarks>(this, &loader);
 
         //========= Tab - Application Launcher ==============///
@@ -639,10 +636,8 @@ public:
 
     void dragEnterEvent(QDragEnterEvent* event) override
     {
-        // if(event->source() != this->tab_file_bookmarks) return;
-
-#if 0
-        if(this->tab_file_bookmarks->isVisible())
+#if 1
+        if(this->tab_deskbookmarks->is_visible())
         {
             const QMimeData* mimeData = event->mimeData();
             std::cout << "Drag Event" << std::endl;
