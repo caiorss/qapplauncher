@@ -48,6 +48,32 @@ inline void set_app_style_sheet(QString file_name)
    app->setStyleSheet(styleSheet);
 }
 
+/** Set global application style to Dark Theme
+  * See: https://gist.github.com/QuantumCD/6245215
+  */
+inline void set_app_dark_style()
+{
+    auto app = static_cast<QApplication *>(QCoreApplication::instance());
+    app->setStyle(QStyleFactory::create("Fusion"));
+    QPalette darkPalette;
+    darkPalette.setColor(QPalette::Window, QColor(53,53,53));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, QColor(25,25,25));
+    darkPalette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+    darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::Button, QColor(53,53,53));
+    darkPalette.setColor(QPalette::ButtonText, Qt::white);
+    darkPalette.setColor(QPalette::BrightText, Qt::red);
+    darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+
+    darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+    app->setPalette(darkPalette);
+    app->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
+}
+
 /** Creates a tray icon that toggles main window visiblity when clicked. */
 inline QSystemTrayIcon*
 make_window_toggle_trayicon(QMainWindow* wnd, QString icon_path, QString tooltip = "")
