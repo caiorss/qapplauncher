@@ -45,7 +45,8 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
     // QObject::connect(btn_remove, &QPushButton::clicked, this, &CustomerForm::Reset);
 
     // Signals and slots with lambda function
-    loader->on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
+    // loader->on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
+    loader->on_button_clicked("btn_run", this, &Tab_ApplicationLauncher::run_selected_item);
 
 
     // Launch application double clicked application from registry (QListWidget)
