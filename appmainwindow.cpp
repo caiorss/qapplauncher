@@ -57,6 +57,7 @@ AppMainWindow::AppMainWindow()
     // Register pointer to static member function
     loader.on_button_clicked("btn_quit_app", &QApplication::quit);
 
+    loader.on_button_clicked("btn_show_help", &QWhatsThis::enterWhatsThisMode);
 
     loader.on_src_clicked<QCheckBox>("chb_dark_theme", [](QCheckBox* sender)
                                      {
