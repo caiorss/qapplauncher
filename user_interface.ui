@@ -23,8 +23,11 @@
       <height>541</height>
      </rect>
     </property>
+    <property name="whatsThis">
+     <string>Tab for application launcher.</string>
+    </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -164,6 +167,9 @@
      </widget>
     </widget>
     <widget class="QWidget" name="tab_file_bookmarks">
+     <property name="whatsThis">
+      <string>Tab for files, directories and URL bookmarks</string>
+     </property>
      <attribute name="title">
       <string>Desktop Bookmarks</string>
      </attribute>
@@ -172,12 +178,12 @@
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>141</width>
+        <width>201</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>File/Directory registry</string>
+       <string>File/Directory registry bookmark</string>
       </property>
      </widget>
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -195,6 +201,9 @@
          <property name="toolTip">
           <string>Open User's home directory</string>
          </property>
+         <property name="whatsThis">
+          <string>Button for opening user home directory</string>
+         </property>
          <property name="text">
           <string>Open Home</string>
          </property>
@@ -204,6 +213,9 @@
         <widget class="QPushButton" name="btn_open_docs">
          <property name="toolTip">
           <string>Open documents directory</string>
+         </property>
+         <property name="whatsThis">
+          <string>Button for opening user's documents</string>
          </property>
          <property name="text">
           <string>Open Documents</string>
@@ -215,6 +227,9 @@
          <property name="toolTip">
           <string>Open user's Desktop directory</string>
          </property>
+         <property name="whatsThis">
+          <string>Button for opening user's Desktop directory</string>
+         </property>
          <property name="text">
           <string>Open Desktop</string>
          </property>
@@ -224,6 +239,9 @@
         <widget class="QPushButton" name="btn_open_fonts">
          <property name="toolTip">
           <string>Open fonts directory</string>
+         </property>
+         <property name="whatsThis">
+          <string>Button for opening user's font directory</string>
          </property>
          <property name="text">
           <string>Open Fonts</string>
@@ -240,6 +258,9 @@
         <width>651</width>
         <height>211</height>
        </rect>
+      </property>
+      <property name="whatsThis">
+       <string>TableView that shows all bookmark files, directories and URLs available. Just double click at any item to open it.</string>
       </property>
      </widget>
      <widget class="QWidget" name="formLayoutWidget">
@@ -270,7 +291,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLineEdit" name="entry_file_name"/>
+        <widget class="QLineEdit" name="entry_file_name">
+         <property name="whatsThis">
+          <string>Name of bookmarked URL or file/directory without absolute path</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_6">
@@ -306,6 +331,9 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QPushButton" name="btn_open_file">
+         <property name="whatsThis">
+          <string>Open selected item in the file/directory registry bookmark</string>
+         </property>
          <property name="text">
           <string>Open</string>
          </property>
@@ -313,6 +341,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="btn_remove_file">
+         <property name="whatsThis">
+          <string>Button for removing selected item from file/directory bookmark</string>
+         </property>
          <property name="text">
           <string>Remove</string>
          </property>
@@ -320,6 +351,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="btn_add_file">
+         <property name="whatsThis">
+          <string>Button for adding new file to the file/directory bookmarks</string>
+         </property>
          <property name="text">
           <string>Add</string>
          </property>
@@ -369,6 +403,38 @@
     </property>
     <property name="text">
      <string>Quit App.</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_show_help">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>10</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Show help for specific user interface element. Click here, then click at soem UI element.</string>
+    </property>
+    <property name="text">
+     <string>What is This</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chb_dark_theme">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>10</y>
+      <width>85</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Enable Dark theme when checked</string>
+    </property>
+    <property name="text">
+     <string>Dark Theme</string>
     </property>
    </widget>
   </widget>
