@@ -57,6 +57,15 @@ AppMainWindow::AppMainWindow()
     // Register pointer to static member function
     loader.on_button_clicked("btn_quit_app", &QApplication::quit);
 
+
+    loader.on_src_clicked<QCheckBox>("chb_dark_theme", [](QCheckBox* sender)
+                                     {
+                                         if(sender->isChecked())
+                                             qtutils::set_app_dark_style();
+                                         else
+                                             qtutils::set_app_default_style();
+                                     });
+
     // Save application state when the main Window is destroyed
     QObject::connect(this, &QMainWindow::destroyed, [this]
                      {
