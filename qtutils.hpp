@@ -7,6 +7,7 @@
 #include <QSysInfo>
 #include <QtConcurrent/QtConcurrent>
 
+#include <string>
 #include <cassert>
 
 namespace qtutils
@@ -30,6 +31,21 @@ template<typename Sender, typename Callback>
 void on_double_clicked(Sender* pSender, Callback&& event_handler)
 {
     QObject::connect(pSender, &Sender::doubleClicked, event_handler);
+}
+
+
+inline void set_app_style_sheet(QString file_name)
+{
+    using namespace std::string_literals;
+    auto app = static_cast<QApplication *>(QCoreApplication::instance());
+    QFile file(file_name);
+    if(!file.open(QFile::ReadOnly))
+    {
+        throw std::runtime_error(" ERROR: style sheet file not found <"s
+                                 + file_name.toStdString() + "> ");
+    }
+   QString styleSheet = QLatin1String(file.readAll());
+   app->setStyleSheet(styleSheet);
 }
 
 /** Creates a tray icon that toggles main window visiblity when clicked. */
