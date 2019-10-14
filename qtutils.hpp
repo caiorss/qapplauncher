@@ -20,6 +20,7 @@ void on_clicked(Sender* pSender, Callback&& event_handler)
     QObject::connect(pSender, &Sender::clicked, event_handler);
 }
 
+
 template<typename Sender, typename Receiver, typename Method>
 void on_clicked(Sender* pSender, Receiver* pReceiver, Method&& event_handler)
 {
@@ -72,6 +73,14 @@ inline void set_app_dark_style()
     darkPalette.setColor(QPalette::HighlightedText, Qt::black);
     app->setPalette(darkPalette);
     app->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
+}
+
+/** @brief Reset application style. */
+inline void set_app_default_style()
+{
+    auto app = static_cast<QApplication *>(QCoreApplication::instance());
+    app->setPalette(qApp->style()->standardPalette());
+    app->setStyleSheet("");
 }
 
 /** Creates a tray icon that toggles main window visiblity when clicked. */
