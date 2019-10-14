@@ -86,7 +86,11 @@ public:
     {
         Sender* pSender = form->findChild<Sender*>(widget_name);
         this->ensure_widget_loaded(pSender, widget_name);
-        QObject::connect(pSender, &Sender::clicked, pReceiver, receiver_method);
+        QObject::connect(pSender, &Sender::clicked, [=]
+                         {
+                             // Member function pointer invocation
+                             (pReceiver->*receiver_method)();
+                         });
     }
 
     template<typename Sender, typename Callback>
