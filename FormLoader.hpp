@@ -89,6 +89,14 @@ public:
         QObject::connect(pSender, &Sender::clicked, pReceiver, receiver_method);
     }
 
+    template<typename Sender, typename Callback>
+    void on_src_clicked(QString widget_name, Callback&& event_handler)
+    {
+        Sender* pSender = form->findChild<Sender*>(widget_name);
+        this->ensure_widget_loaded(pSender, widget_name);
+        QObject::connect(pSender, &Sender::clicked, [=]{ event_handler(pSender); });
+    }
+
 
     template<typename Callback>
     void on_button_clicked(QString widget_name, Callback&& event_handler)
