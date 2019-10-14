@@ -48,7 +48,8 @@ AppMainWindow::AppMainWindow()
     // Enable Drag and Drop Event
     this->setAcceptDrops(true);
 
-
+    // Register pointer to static member function
+    loader.on_button_clicked("btn_quit_app", &QApplication::quit);
 
     // Save application state when the main Window is destroyed
     QObject::connect(this, &QMainWindow::destroyed, [this]
