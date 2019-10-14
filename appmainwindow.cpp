@@ -5,8 +5,14 @@ AppMainWindow::AppMainWindow()
     : loader{FormLoader(this, ":/assets/user_interface.ui")}
 {
     form = loader.GetForm();
+
+    //====== Set Up Tabs ===================================/q
     tab_applauncher   = std::make_unique<Tab_ApplicationLauncher>(this, &loader);
     tab_deskbookmarks = std::make_unique<Tab_DesktopBookmarks>(this, &loader);
+
+    //===== Set up User Interface Theme =================//
+
+    qtutils::set_app_dark_style();
 
     //========= Create Tray Icon =======================//
 
@@ -80,7 +86,8 @@ AppMainWindow::AppMainWindow()
 #endif
 
 /// Make this window stay alwys on top
-void AppMainWindow::setWindowAlwaysOnTop()
+void
+AppMainWindow::setWindowAlwaysOnTop()
 {
     this->setWindowFlags(Qt::WindowStaysOnTopHint);
 }
