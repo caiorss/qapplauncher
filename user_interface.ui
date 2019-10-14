@@ -7,24 +7,24 @@
     <x>0</x>
     <y>0</y>
     <width>757</width>
-    <height>552</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Command Launcher</string>
+   <string>Desktop Launcher</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>0</y>
+      <y>50</y>
       <width>711</width>
-      <height>511</height>
+      <height>541</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -354,6 +354,22 @@
       </property>
      </widget>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="btn_quit_app">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>10</y>
+      <width>80</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Quit application</string>
+    </property>
+    <property name="text">
+     <string>Quit App.</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
