@@ -426,7 +426,7 @@
      <rect>
       <x>240</x>
       <y>10</y>
-      <width>85</width>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -434,7 +434,7 @@
      <string>Enable Dark theme when checked</string>
     </property>
     <property name="text">
-     <string>Dark Theme</string>
+     <string>Toggle/Dark Theme</string>
     </property>
    </widget>
   </widget>
