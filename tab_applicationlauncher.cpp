@@ -7,10 +7,14 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
     //========= Tab - Application Launcher ==============///
 
     // Load controls named in the form "user_interface.ui"
-    cmd_input         = loader->find_child<QLineEdit>("cmd_input");
+    cmd_input         = loader->find_child<QComboBox>("cmd_input");
     app_registry      = loader->find_child<QListWidget>("cmd_registry");
     chb_editable      = loader->find_child<QCheckBox>("chb_editable");
     chb_always_on_top = loader->find_child<QCheckBox>("chb_always_on_top");
+
+    // Combobox and list view share the same model
+    cmd_input->setModel(app_registry->model());
+
 
 
     // See: https://www.qtcentre.org/threads/15464-WindowStaysOnTopHint
@@ -31,12 +35,13 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
 
     loader->on_button_clicked("btn_add", [&self = *this]
                               {
-                                  auto text = self.cmd_input->text();
+                                  auto text = self.cmd_input->currentText();
                                   if(text.isEmpty()) { return; }
                                   auto item = new QListWidgetItem();
                                   item->setText(text);
-                                  self.app_registry->insertItem(0, item);
-                                  self.cmd_input->clear();
+                                  // self.app_registry->insertItem(0, item);
+                                  self.app_registry->addItem(item);
+                                  // self.cmd_input->clear();
                                   self.save_settings();
                               });
     // qtutils::on_clicked(btn_add,);

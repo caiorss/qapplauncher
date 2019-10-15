@@ -10,7 +10,7 @@ class Tab_ApplicationLauncher
     QWidget*    parent;
 
     // Extract children widgets from from file
-    QLineEdit*   cmd_input;
+    QComboBox*   cmd_input;
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
     QListWidget* app_registry;
