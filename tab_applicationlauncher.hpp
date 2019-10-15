@@ -2,7 +2,34 @@
 #define TAB_APPLICATIONLAUNCHER_HPP
 
 #include "FormLoader.hpp"
+#include "serialization.hpp"
 
+
+
+namespace qtutils::serialization
+{
+    template<>
+    inline QVariant value_writer(QListWidget& ref)
+    {
+        QStringList list;
+        for(int i = 0; i < ref.count(); ++i)
+        {
+            list << ref.item(i)->text();
+        }
+        return list;
+    }
+
+    template<>
+    inline void value_reader(QListWidget& ref, QVariant value)
+    {
+        QStringList lst = value.toStringList();
+        for(int i = 0; i < lst.count(); i++){
+            ref.addItem(lst.at(i));
+        }
+    }
+
+
+}
 
 class Tab_ApplicationLauncher
 {
@@ -39,6 +66,13 @@ public:
 
     void save_settings();
 
+#if 1
+    template<typename Visitor>
+    void accept(Visitor& visitor)
+    {
+        visitor.visit("app_registry", *app_registry);
+    }
+#endif
 
 }; // ---- End of class Tab_ApplicationLauncher ----------//
 
