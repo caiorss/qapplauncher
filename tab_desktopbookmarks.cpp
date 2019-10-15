@@ -32,12 +32,17 @@ Tab_DesktopBookmarks::Tab_DesktopBookmarks(QWidget* parent, FormLoader* loader):
     entry_fname->setReadOnly(true);
     auto entry_fpath = loader->find_child<QLineEdit>("entry_file_path");
     entry_fpath->setReadOnly(true);
+    auto entry_brief = loader->find_child<QLineEdit>("entry_file_brief");
+    // entry_brief->setReadOnly(true);
+
+
 
     auto mapper = new QDataWidgetMapper(parent);
     mapper->setModel(tview_model);
     mapper->addMapping(entry_ftype, 0, "text");
     mapper->addMapping(entry_fname, 1, "text");
     mapper->addMapping(entry_fpath, 2, "text");
+    mapper->addMapping(entry_brief, 3, "text");
     mapper->toFirst();
 
     // Event triggered when the selection of current row is changed.
