@@ -6,8 +6,6 @@
 
 //--- QT Headers ---//
 #include <QtCore>
-#include <QtWidgets>
-
 
 namespace qtutils::serialization
 {
