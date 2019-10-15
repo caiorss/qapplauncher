@@ -2,8 +2,11 @@
 #include "qtutils.hpp"
 #include <iostream>
 
-Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* loader):
-    parent(parent), loader{loader}
+Tab_ApplicationLauncher::Tab_ApplicationLauncher(
+      QWidget* parent
+    , FormLoader* loader
+    , std::function<void ()> callback
+    ): parent(parent), loader{loader}, save_settings_callback{callback}
 {
     //========= Tab - Application Launcher ==============///
 
@@ -43,7 +46,8 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
                                   // self.app_registry->insertItem(0, item);
                                   self.app_registry->addItem(item);
                                   // self.cmd_input->clear();
-                                  self.save_settings();
+                                  self.save_settings_callback();
+                                  //self.save_settings();
                               });
     // qtutils::on_clicked(btn_add,);
 
@@ -68,7 +72,7 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
                                        if(item == nullptr) { return; }
                                        // Set item as editable
                                        item->setFlags( item->flags() | Qt::ItemIsEditable);
-                                       self.save_settings();
+                                       self.save_settings_callback();
                                        return;
                                    }
                                    self.run_selected_item();
@@ -82,7 +86,7 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
                                   if(pItem == nullptr) { return; }
                                   self.app_registry->removeItemWidget(pItem);
                                   delete pItem;
-                                  self.save_settings();
+                                  self.save_settings_callback();
                               });
 
 } // --- End of Tab_ApplicationLauncher CTOR -------//
@@ -127,7 +131,3 @@ Tab_ApplicationLauncher::at(int row)
     return this->app_registry->item(row);
 }
 
-void Tab_ApplicationLauncher::save_settings()
-{
-
-}

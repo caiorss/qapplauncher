@@ -3,8 +3,51 @@
 
 #include "FormLoader.hpp"
 #include "filebookmarkitemmodel.hpp"
+#include "serialization.hpp"
+
 #include <QtCore>
 #include <QWidget>
+
+namespace qtutils::serialization
+{
+template<>
+inline QVariant value_writer(FileBookmarkItemModel& ref)
+{
+    QByteArray arr;
+    QDataStream ss{&arr, QIODevice::WriteOnly};
+
+    ss << ref.count();
+
+    //QStringList list;
+    for(int i = 0; i < ref.count(); ++i)
+    {
+        //list << ref.at(i).uri_path;
+        auto& item = ref.at(i);
+        ss << item.uri_path << item.brief << item.description;
+    }
+    //return list;
+    return arr;
+}
+
+template<>
+inline void value_reader(FileBookmarkItemModel& ref, QVariant value)
+{
+    QByteArray arr = value.toByteArray();
+    QDataStream ss{&arr, QIODevice::ReadOnly};
+
+    int count;
+    ss >> count;
+
+    for(int i = 0; i < count; i++)
+    {
+        QString uri_path, brief, description;
+        ss >> uri_path >> brief >> description;
+        ref.add_item(FileBookmarkItem{uri_path, brief, description});
+    }
+}
+
+}
+
 
 class Tab_DesktopBookmarks
 {
@@ -37,6 +80,13 @@ public:
     void remove_selected_bookmark_file();
 
     void add_bookmark_file();
+
+
+    template<typename Visitor>
+    void accept(Visitor& visitor)
+    {
+        visitor.visit("tview_model", *tview_model);
+    }
 
 }; //----- End of class DesktopBookmarksTable ---------//
 

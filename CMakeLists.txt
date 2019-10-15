@@ -51,6 +51,7 @@ add_executable( applauncher
                 qtutils.hpp
                 RecordTableModel.hpp
                 FormLoader.hpp
+                serialization.hpp
 
                 # Class FileBookMarkItem
                 FileBookmarkItem.hpp

@@ -1,5 +1,5 @@
 #include "appmainwindow.hpp"
-
+#include "serialization.hpp"
 
 AppMainWindow::AppMainWindow()
     : loader{FormLoader(this, ":/assets/user_interface.ui")}
@@ -7,7 +7,11 @@ AppMainWindow::AppMainWindow()
     form = loader.GetForm();
 
     //====== Set Up Tabs ===================================/q
-    tab_applauncher   = std::make_unique<Tab_ApplicationLauncher>(this, &loader);
+    tab_applauncher   = std::make_unique<Tab_ApplicationLauncher>(
+        this,
+        &loader,
+        std::bind(&AppMainWindow::save_settings, this)
+        );
     tab_deskbookmarks = std::make_unique<Tab_DesktopBookmarks>(this, &loader);
 
     //===== Set up User Interface Theme =================//
@@ -55,7 +59,12 @@ AppMainWindow::AppMainWindow()
     this->setAcceptDrops(true);
 
     // Register pointer to static member function
-    loader.on_button_clicked("btn_quit_app", &QApplication::quit);
+    loader.on_button_clicked("btn_quit_app",
+                             [self = this]
+                             {
+                                 self->save_settings();
+                                 QApplication::quit();
+                             });
 
     loader.on_button_clicked("btn_show_help", &QWhatsThis::enterWhatsThisMode);
 
@@ -160,25 +169,13 @@ AppMainWindow::save_window_settings()
 void
 AppMainWindow::load_settings()
 {
-    QString settings_file = this->get_settings_file();
-
+    QString settings_file = this->get_settings_file();    
     // Abort if setting files does not exist
     if(!QFile(settings_file).exists()){ return; }
 
-    auto settings = QSettings(settings_file, QSettings::IniFormat);
-    auto commands = settings.value("commands/list").toStringList();
-    for(auto const& cmd: commands){
-        this->tab_applauncher->add_item(cmd);
-        //this->app_registry->addItem(cmd);
-    }
-
-    auto files_bookmarks = settings.value("files_bookmarks/list")
-                               .toStringList();
-#if 1
-    for(auto const& file: files_bookmarks){
-        this->tab_deskbookmarks->add_model_entry(file, "", "");
-    }
-#endif
+    qtutils::serialization::FileReader reader(settings_file);
+    reader(*tab_applauncher);
+    reader(*tab_deskbookmarks);
 
     std::cout << " [INFO] Settings loaded Ok." << std::endl;
 }
@@ -186,25 +183,15 @@ AppMainWindow::load_settings()
 /// Save application state
 void AppMainWindow::save_settings()
 {
-#if 1
-    auto settings_file = this->get_settings_file();
-    auto settings = QSettings(settings_file, QSettings::IniFormat);
-    QStringList list;
-    for(int i = 0; i < this->tab_applauncher->count(); i++)
-    {
-        QListWidgetItem* item = this->tab_applauncher->at(i);
-        list << item->text();
-    }
-    settings.setValue("commands/list", list);
 
-    QStringList file_bookmarks;
-    for(int i = 0; i < tab_deskbookmarks->count(); ++i)
-    {
-        file_bookmarks << tab_deskbookmarks->at(i).uri_path;
-    }
-    settings.setValue("files_bookmarks/list", file_bookmarks);
-    settings.sync();
-#endif
+    std::cout << " [INFO] START Settings saved OK" << std::endl;
+
+    auto settings_file = this->get_settings_file();
+
+    qtutils::serialization::FileWriter writer(settings_file);
+    writer(*tab_applauncher);
+    writer(*tab_deskbookmarks);
+    std::cout << " [INFO] END Settings saved OK" << std::endl;
 }
 
 

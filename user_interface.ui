@@ -27,7 +27,7 @@
      <string>Tab for application launcher.</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -168,7 +168,7 @@
     </widget>
     <widget class="QWidget" name="tab_file_bookmarks">
      <property name="whatsThis">
-      <string>Tab for files, directories and URL bookmarks</string>
+      <string/>
      </property>
      <attribute name="title">
       <string>Desktop Bookmarks</string>

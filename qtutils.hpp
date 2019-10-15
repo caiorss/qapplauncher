@@ -49,6 +49,7 @@ set_shortcut(QWidget*  widget, QKeySequence keybind, Callback&&  event_handler)
                          // If the target widget has focus, call event handler (callback)
                          if(focus_widget == widget) { event_handler(); }
                      });
+    return  shortcut;
 }
 
 inline void set_app_style_sheet(QString file_name)
