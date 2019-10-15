@@ -100,24 +100,6 @@ public:
         dataset[name] = value_writer<T>(value);
     }
 
-
-#if 0
-    template<typename T>
-    void visit(QString name, T& value)
-    {
-        dataset[name] = value;
-    }
-
-    template<typename T>
-    void visit(QString name, QList<T>& value)
-    {
-        QByteArray arr;
-        QDataStream ss{&arr, QIODevice::WriteOnly};
-        ss << value;
-        dataset[name] = arr;
-    }
-#endif
-
 };
 
 
@@ -180,30 +162,6 @@ public:
         QVariant x = dataset[name];
         value_reader(ref, x);
     }
-
-#if 0
-    void visit(QString name, int& value)
-    {
-        value = dataset[name].toInt();
-    }
-    void visit(QString name, double& value)
-    {
-        value = dataset[name].toDouble();
-    }
-    void visit(QString name, QString& value)
-    {
-        value = dataset[name].toString();
-    }
-    void visit(QString name, QStringList& value)
-    {
-        value = dataset[name].toStringList();
-    }
-
-    void visit(QString name, QVariant& value)
-    {
-        value = dataset[name].toString();
-    }
-#endif
 
     template<typename T>
     void visit(QString name, QList<T>& value)
