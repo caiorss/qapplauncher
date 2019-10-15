@@ -114,7 +114,43 @@ make_window_toggle_trayicon(QMainWindow* wnd, QString icon_path, QString tooltip
     tray->show();
     return tray;
 }
+
+inline
+bool create_linux_desktop_shortcut(
+    QString const& destDirectory,
+    QString const& icon_file,
+    QString const& comment = ""
+    )
+{
+    QString imagePath = QCoreApplication::applicationDirPath() + "/icon.png";
+    // Extract resource file to disk to the application's directory.
+    QFile::copy(icon_file, imagePath);
+    auto appName = QCoreApplication::applicationName();
+    auto appPath = QCoreApplication::applicationFilePath();
+
+    QFile link(destDirectory + QDir::separator() + appName + ".desktop");
+    if (link.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream out(&link);
+        out.setCodec("UTF-8");
+        out << "[Desktop Entry]" << endl
+            << "Encoding = UTF-8" << endl
+            << "Version  = 1.0" << endl
+            << "Type     = Application" << endl
+            << "Name     = " << appName << endl
+            << "Comment  = " << comment << endl
+            << "Icon     = " << imagePath    << endl
+            << "Exec     = " << appPath << endl;
+        return true;
+    }
+    return false;
 }
+
+
+
+} //--- End of qtutils namespace ------//
+
+
 
 
 #endif // QTUTILS_HPP
