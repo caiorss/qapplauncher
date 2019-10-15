@@ -178,7 +178,7 @@
        <rect>
         <x>30</x>
         <y>20</y>
-        <width>201</width>
+        <width>221</width>
         <height>16</height>
        </rect>
       </property>
@@ -424,7 +424,7 @@
    <widget class="QCheckBox" name="chb_dark_theme">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>420</x>
       <y>10</y>
       <width>151</width>
       <height>21</height>
@@ -435,6 +435,19 @@
     </property>
     <property name="text">
      <string>Toggle/Dark Theme</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_install_icon">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>10</y>
+      <width>151</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Install Desktop Icon</string>
     </property>
    </widget>
   </widget>
