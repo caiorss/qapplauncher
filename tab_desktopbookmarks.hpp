@@ -66,6 +66,13 @@ public:
 
     void add_bookmark_file();
 
+
+    template<typename Visitor>
+    void accept(Visitor& visitor)
+    {
+        visitor.visit("tview_model", *tview_model);
+    }
+
 }; //----- End of class DesktopBookmarksTable ---------//
 
 
