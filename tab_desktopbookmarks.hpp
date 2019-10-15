@@ -13,21 +13,36 @@ namespace qtutils::serialization
 template<>
 inline QVariant value_writer(FileBookmarkItemModel& ref)
 {
-    QStringList list;
+    QByteArray arr;
+    QDataStream ss{&arr, QIODevice::WriteOnly};
+
+    ss << ref.count();
+
+    //QStringList list;
     for(int i = 0; i < ref.count(); ++i)
     {
-        list << ref.at(i).uri_path;
+        //list << ref.at(i).uri_path;
+        auto& item = ref.at(i);
+        ss << item.uri_path << item.brief << item.description;
     }
-    return list;
+    //return list;
+    return arr;
 }
 
 template<>
 inline void value_reader(FileBookmarkItemModel& ref, QVariant value)
 {
-    QStringList lst = value.toStringList();
-    for(int i = 0; i < lst.count(); i++)
+    QByteArray arr = value.toByteArray();
+    QDataStream ss{&arr, QIODevice::ReadOnly};
+
+    int count;
+    ss >> count;
+
+    for(int i = 0; i < count; i++)
     {
-        ref.add_item(FileBookmarkItem{lst.at(i), "", ""});
+        QString uri_path, brief, description;
+        ss >> uri_path >> brief >> description;
+        ref.add_item(FileBookmarkItem{uri_path, brief, description});
     }
 }
 
