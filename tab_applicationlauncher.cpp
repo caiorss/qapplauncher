@@ -103,6 +103,15 @@ void Tab_ApplicationLauncher::run_selected_item()
               << std::endl;
 }
 
+void Tab_ApplicationLauncher::run_combobox_command()
+{
+    auto command = cmd_input->currentText();
+    bool status = QProcess::startDetached(command);
+    std::cout << " [INFO] Run command " << command.toStdString()
+              << " status = " << (status ? "OK" : "FAILURE")
+              << std::endl;
+}
+
 void  Tab_ApplicationLauncher::add_item(QString command)
 {
     this->app_registry->addItem(command);

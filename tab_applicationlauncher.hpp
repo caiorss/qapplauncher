@@ -18,8 +18,11 @@ public:
 
     Tab_ApplicationLauncher(QWidget* parent, FormLoader* loader);
 
-    // Run item selected in the QListWidget (ApplicationRegistry)
+    /// Run item selected in the QListWidget (ApplicationRegistry)
     void run_selected_item();
+
+    /// Run command entered by user in combobox
+    void run_combobox_command();
 
     /// Add new command to command registry widget
     void add_item(QString command);
