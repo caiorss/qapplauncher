@@ -9,10 +9,10 @@ FileBookmarkItemModel::FileBookmarkItemModel(QWidget* parent)
 {
 }
 
-// Constant
+// Constant => Returns the number of columns
 int FileBookmarkItemModel::column_count() const
 {
-    return 3;
+    return 4;
 }
 
 // Provide column name
@@ -22,6 +22,7 @@ FileBookmarkItemModel::column_name(int column) const
     if(column == 0) { return "Type";     }
     if(column == 1) { return "File/URI"; }
     if(column == 2) { return "Path";     }
+    if(column == 3) { return "Brief";    }
     return QString{};
 }
 
@@ -64,6 +65,7 @@ FileBookmarkItemModel::display_item_row(FileBookmarkItem const& item, int column
     if(column == 0) return item_type;
     if(column == 1) return file_name;
     if(column == 2) return file_path;
+    if(column == 3) return item.brief;
 
     return QString("<EMPTY>");
 }
@@ -71,6 +73,7 @@ FileBookmarkItemModel::display_item_row(FileBookmarkItem const& item, int column
 bool
 FileBookmarkItemModel::set_element(int column, QVariant value, FileBookmarkItem& item)
 {
+#if 0
     if(column == 0){
         item.uri_path = value.toString();
         return true;
@@ -79,9 +82,14 @@ FileBookmarkItemModel::set_element(int column, QVariant value, FileBookmarkItem&
         item.brief = value.toString();
         return true;
     }
-    if(column == 2){
-        item.description = value.toString();
+#endif
+
+    // Only the brief column is editable
+    if(column == 3)
+    {
+        item.brief = value.toString();
         return true;
-    }
+    }    
+
     return false;
 }
