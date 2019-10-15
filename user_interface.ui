@@ -27,7 +27,7 @@
      <string>Tab for application launcher.</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -81,19 +81,6 @@
        <string>Remove</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="cmd_input">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>461</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Enter commands to be run.</string>
-      </property>
-     </widget>
      <widget class="QListWidget" name="cmd_registry">
       <property name="geometry">
        <rect>
@@ -124,7 +111,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>70</y>
+        <y>60</y>
         <width>131</width>
         <height>16</height>
        </rect>
@@ -163,6 +150,19 @@
       </property>
       <property name="text">
        <string> Commands Editable</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cmd_input">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>461</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
