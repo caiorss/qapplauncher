@@ -14,9 +14,12 @@ class Tab_ApplicationLauncher
     QCheckBox*   chb_editable;
     QCheckBox*   chb_always_on_top;
     QListWidget* app_registry;
+
+    std::function<void ()> save_settings_callback;
 public:
 
-    Tab_ApplicationLauncher(QWidget* parent, FormLoader* loader);
+    Tab_ApplicationLauncher(QWidget* parent, FormLoader* loader,
+                            std::function<void ()> save_settings_callback);
 
     /// Run item selected in the QListWidget (ApplicationRegistry)
     void run_selected_item();
