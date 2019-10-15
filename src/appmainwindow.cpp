@@ -76,6 +76,19 @@ AppMainWindow::AppMainWindow()
                                              qtutils::set_app_default_style();
                                      });
 
+    loader.on_button_clicked(
+        "btn_install_icon",
+        []{
+            QString desktop_path =
+                QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
+
+            qtutils::create_linux_desktop_shortcut(
+                desktop_path
+                , ":/assets/appicon.png"
+                , "Application for bookmarking files, directories and applications"
+                );
+        });
+
     // Save application state when the main Window is destroyed
     QObject::connect(this, &QMainWindow::destroyed, [this]
                      {
