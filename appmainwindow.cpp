@@ -170,24 +170,12 @@ void
 AppMainWindow::load_settings()
 {
     QString settings_file = this->get_settings_file();
-
     // Abort if setting files does not exist
     if(!QFile(settings_file).exists()){ return; }
 
-    auto settings = QSettings(settings_file, QSettings::IniFormat);
-    auto commands = settings.value("commands/list").toStringList();
-    for(auto const& cmd: commands){
-        this->tab_applauncher->add_item(cmd);
-        //this->app_registry->addItem(cmd);
-    }
-
-    auto files_bookmarks = settings.value("files_bookmarks/list")
-                               .toStringList();
-#if 1
-    for(auto const& file: files_bookmarks){
-        this->tab_deskbookmarks->add_model_entry(file, "", "");
-    }
-#endif
+    qtutils::serialization::FileReader reader(settings_file);
+    reader(*tab_applauncher);
+    reader(*tab_deskbookmarks);
 
     std::cout << " [INFO] Settings loaded Ok." << std::endl;
 }
