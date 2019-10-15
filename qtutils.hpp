@@ -34,6 +34,22 @@ void on_double_clicked(Sender* pSender, Callback&& event_handler)
     QObject::connect(pSender, &Sender::doubleClicked, event_handler);
 }
 
+/** Set shortcut to widget */
+template<typename Callback>
+QShortcut*
+set_shortcut(QWidget*  widget, QKeySequence keybind, Callback&&  event_handler)
+{
+    auto shortcut = new QShortcut(keybind, widget);
+    QObject::connect(shortcut, &QShortcut::activated,
+                     [=]{
+                         // Get pointer to current application, same as qApp
+                         auto app = static_cast<QApplication *>(QCoreApplication::instance());
+                         // Get widget that has focus
+                         QWidget* focus_widget = app->focusWidget();
+                         // If the target widget has focus, call event handler (callback)
+                         if(focus_widget == widget) { event_handler(); }
+                     });
+}
 
 inline void set_app_style_sheet(QString file_name)
 {
