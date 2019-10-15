@@ -1,5 +1,5 @@
+#include <qtutils/serialization.hpp>
 #include "appmainwindow.hpp"
-#include "serialization.hpp"
 
 AppMainWindow::AppMainWindow()
     : loader{FormLoader(this, ":/assets/user_interface.ui")}

@@ -32,36 +32,40 @@ endfunction()
 #=============== Target Configurations ============#
 
 #------- Target applauncher ----------------------------#
+#
+
+
+# QT Utilities
+# qtutils.hpp
+# RecordTableModel.hpp
+#FormLoader.hpp
+ # serialization.hpp
+
 
 add_executable( applauncher
 
-                main.cpp
+                src/main.cpp
 
-                appmainwindow.cpp
-                appmainwindow.hpp
+                src/appmainwindow.cpp
+                src/appmainwindow.hpp
 
-                tab_desktopbookmarks.cpp
-                tab_desktopbookmarks.hpp
-
-                # Class Tab_ApplicationLauncher
-                tab_applicationlauncher.cpp
-                tab_applicationlauncher.hpp
-
-                # QT Utilities
-                qtutils.hpp
-                RecordTableModel.hpp
-                FormLoader.hpp
-                serialization.hpp
+                src/tab_desktopbookmarks.cpp
+                src/tab_desktopbookmarks.hpp
 
                 # Class FileBookMarkItem
-                FileBookmarkItem.hpp
+                src/FileBookmarkItem.hpp
 
                 # Class: FileBookMarkItemModel
-                filebookmarkitemmodel.cpp
-                filebookmarkitemmodel.hpp
+                src/filebookmarkitemmodel.cpp
+                src/filebookmarkitemmodel.hpp
+
+                # Class Tab_ApplicationLauncher
+                src/tab_applicationlauncher.cpp
+                src/tab_applicationlauncher.hpp
 
                 resources.qrc
                )           
+target_include_directories(applauncher PUBLIC .)
 copy_after_build( applauncher )
 
 target_link_libraries(applauncher

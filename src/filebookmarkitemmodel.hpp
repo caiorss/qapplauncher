@@ -2,7 +2,7 @@
 #define FILEBOOKMARKITEMMODEL_HPP
 
 #include "FileBookmarkItem.hpp"
-#include "RecordTableModel.hpp"
+#include <qtutils/RecordTableModel.hpp>
 
 class FileBookmarkItemModel: public RecordTableModel<FileBookmarkItem>
 {

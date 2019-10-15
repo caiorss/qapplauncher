@@ -1,8 +1,8 @@
 #ifndef TAB_APPLICATIONLAUNCHER_HPP
 #define TAB_APPLICATIONLAUNCHER_HPP
 
-#include "FormLoader.hpp"
-#include "serialization.hpp"
+#include <qtutils/FormLoader.hpp>
+#include <qtutils/serialization.hpp>
 
 
 namespace qtutils::serialization

@@ -1,6 +1,7 @@
-#include "tab_applicationlauncher.hpp"
-#include "qtutils.hpp"
 #include <iostream>
+
+#include "tab_applicationlauncher.hpp"
+#include <qtutils/qtutils.hpp>
 
 Tab_ApplicationLauncher::Tab_ApplicationLauncher(
       QWidget* parent

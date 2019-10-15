@@ -4,10 +4,9 @@
 #include <QtWidgets>
 
 //------ Headers of helper classes and namespaces -------//
-#include "qtutils.hpp"
-#include "FormLoader.hpp"
-#include "RecordTableModel.hpp"
-
+#include <qtutils/qtutils.hpp>
+#include <qtutils/FormLoader.hpp>
+#include <qtutils/RecordTableModel.hpp>
 
 // ----- Headers of Domain Classes -----//
 #include "filebookmarkitemmodel.hpp"

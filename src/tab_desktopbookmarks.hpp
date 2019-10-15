@@ -1,9 +1,11 @@
 #ifndef TAB_DESKTOPBOOKMARKS_HPP
 #define TAB_DESKTOPBOOKMARKS_HPP
 
-#include "FormLoader.hpp"
+#include <qtutils/FormLoader.hpp>
+#include <qtutils/serialization.hpp>
+
 #include "filebookmarkitemmodel.hpp"
-#include "serialization.hpp"
+
 
 #include <QtCore>
 #include <QWidget>
