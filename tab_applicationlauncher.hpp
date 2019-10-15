@@ -5,7 +5,6 @@
 #include "serialization.hpp"
 
 
-
 namespace qtutils::serialization
 {
     template<>
@@ -27,7 +26,6 @@ namespace qtutils::serialization
             ref.addItem(lst.at(i));
         }
     }
-
 
 }
 

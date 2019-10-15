@@ -3,8 +3,36 @@
 
 #include "FormLoader.hpp"
 #include "filebookmarkitemmodel.hpp"
+#include "serialization.hpp"
+
 #include <QtCore>
 #include <QWidget>
+
+namespace qtutils::serialization
+{
+template<>
+inline QVariant value_writer(FileBookmarkItemModel& ref)
+{
+    QStringList list;
+    for(int i = 0; i < ref.count(); ++i)
+    {
+        list << ref.at(i).uri_path;
+    }
+    return list;
+}
+
+template<>
+inline void value_reader(FileBookmarkItemModel& ref, QVariant value)
+{
+    QStringList lst = value.toStringList();
+    for(int i = 0; i < lst.count(); i++)
+    {
+        ref.add_item(FileBookmarkItem{lst.at(i), "", ""});
+    }
+}
+
+}
+
 
 class Tab_DesktopBookmarks
 {
