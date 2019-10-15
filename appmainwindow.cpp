@@ -7,7 +7,11 @@ AppMainWindow::AppMainWindow()
     form = loader.GetForm();
 
     //====== Set Up Tabs ===================================/q
-    tab_applauncher   = std::make_unique<Tab_ApplicationLauncher>(this, &loader);
+    tab_applauncher   = std::make_unique<Tab_ApplicationLauncher>(
+        this,
+        &loader,
+        std::bind(&AppMainWindow::save_settings, this)
+        );
     tab_deskbookmarks = std::make_unique<Tab_DesktopBookmarks>(this, &loader);
 
     //===== Set up User Interface Theme =================//
