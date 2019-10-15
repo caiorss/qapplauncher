@@ -59,7 +59,12 @@ AppMainWindow::AppMainWindow()
     this->setAcceptDrops(true);
 
     // Register pointer to static member function
-    loader.on_button_clicked("btn_quit_app", &QApplication::quit);
+    loader.on_button_clicked("btn_quit_app",
+                             [self = this]
+                             {
+                                 self->save_settings();
+                                 QApplication::quit();
+                             });
 
     loader.on_button_clicked("btn_show_help", &QWhatsThis::enterWhatsThisMode);
 
