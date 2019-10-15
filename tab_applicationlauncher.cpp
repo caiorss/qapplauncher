@@ -1,4 +1,5 @@
 #include "tab_applicationlauncher.hpp"
+#include "qtutils.hpp"
 #include <iostream>
 
 Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* loader):
@@ -51,14 +52,11 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(QWidget* parent, FormLoader* lo
 
     // Signals and slots with lambda function
     // loader->on_button_clicked("btn_run", [self = this]{ self->run_selected_item(); });
-    loader->on_button_clicked("btn_run",
-                              [=]{
-                                  auto command = cmd_input->text();
-                                  bool status = QProcess::startDetached(command);
-                                  std::cout << " [INFO] Run command " << command.toStdString()
-                                            << " status = " << (status ? "OK" : "FAILURE")
-                                            << std::endl;
-                              });
+    loader->on_button_clicked("btn_run", this
+                              , &Tab_ApplicationLauncher::run_combobox_command) ;
+
+    qtutils::set_shortcut(cmd_input, Qt::Key_Return,
+                          std::bind(&Tab_ApplicationLauncher::run_combobox_command, this));
 
 
     // Launch application double clicked application from registry (QListWidget)
