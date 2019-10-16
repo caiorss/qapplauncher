@@ -1,0 +1,42 @@
+* QAppLauncher 
+*** Description 
+
+ + Description:
+   + Application launcher and bookmark system for files and directories.
+
+ + Capabilities:
+
+   * Launch commands, applications and bookmark applications or
+     commands for launching later.
+
+   * Bookmark files and directories by dragging and dropping.
+
+   * Open bookmarked files with default-system application.
+
+   * Add small notes to bookmarked files.
+
+   * Tray icon => Click at the tray icon for hiding/showing the
+     application's window.
+
+*** Screenshots 
+
+ *Application Launcher Tab* 
+
+[[file:images/tab_applauncher.png][file:images/tab_applauncher.png]]
+
+ *Desktop Bookmarks Tab* 
+
+Just drag and drop files to the Desktop Bookmarks tab. The file can be
+opened either by double clicking at it in the list view widget or by
+clicking at the button add. 
+
+[[file:images/tab_desktop_bookmarks.png][file:images/tab_desktop_bookmarks.png]]
+
+ *Tray Icon* 
+
+[[file:images/tray_icon.png][file:images/tray_icon.png]] 
+
+*** Repository 
+
+ + https://github.com/caiorss/qapplauncher 
+
