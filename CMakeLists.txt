@@ -41,7 +41,16 @@ endfunction()
 #FormLoader.hpp
  # serialization.hpp
 
+# Brief: Header-only libraries with header-only and template utitlites for QT.
+#-----------------------------------------------------------------------
+add_library(qtutils_ide qtutils/qtutils.hpp
+                        qtutils/serialization.hpp
+                        qtutils/FormLoader.hpp
+                        qtutils/RecordTableModel.hpp)
 
+
+# Brief: Main executable - GUI Graphical User Interface
+#-----------------------------------------------------------
 add_executable( applauncher
 
                 src/main.cpp
@@ -65,7 +74,8 @@ add_executable( applauncher
 
                 resources.qrc
                )           
-target_include_directories(applauncher PUBLIC .)
+# target_include_directories(applauncher PUBLIC .)
+target_link_libraries(applauncher qtutils_ide)
 copy_after_build( applauncher )
 
 target_link_libraries(applauncher
