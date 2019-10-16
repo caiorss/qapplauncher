@@ -75,7 +75,7 @@ add_executable( applauncher
                 resources.qrc
                )           
 # target_include_directories(applauncher PUBLIC .)
-target_link_libraries(applauncher qtutils_ide)
+# target_link_libraries(applauncher qtutils_ide)
 copy_after_build( applauncher )
 
 target_link_libraries(applauncher
