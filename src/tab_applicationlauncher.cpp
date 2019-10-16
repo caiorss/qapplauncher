@@ -62,9 +62,7 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(
     loader->on_button_clicked("btn_run", this
                               , &Tab_ApplicationLauncher::run_combobox_command) ;
 
-    qx::set_shortcut(cmd_input, Qt::Key_Return,
-                          std::bind(&Tab_ApplicationLauncher::run_combobox_command, this));
-
+    // qx::set_shortcut(cmd_input, Qt::Key_Return, std::bind(&Tab_ApplicationLauncher::run_combobox_command, this));
 
     // Launch application double clicked application from registry (QListWidget)
     loader->on_double_clicked<QListWidget>("cmd_registry", [&self = *this]

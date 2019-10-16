@@ -17,7 +17,7 @@ Tab_DesktopBookmarks::Tab_DesktopBookmarks(QWidget* parent, FormLoader* loader):
     tview_disp->setShowGrid(false);
     tview_disp->setSortingEnabled(true);
     tview_disp->setWhatsThis("List containing desktop file/directories bookmarks");
-
+    tview_disp->setFocus();
 
     tview_model = new FileBookmarkItemModel(parent);
     tview_disp->setModel(tview_model);
