@@ -7,7 +7,7 @@
 //--- QT Headers ---//
 #include <QtCore>
 
-namespace qtutils::serialization
+namespace qxstl::serialization
 {
 
 template<typename T>

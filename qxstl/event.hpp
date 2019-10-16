@@ -10,7 +10,7 @@
 #include <string>
 #include <cassert>
 
-namespace qtutils
+namespace qxstl::event
 {
 
 // Sender widgets: QPushButton, QListWidget, QCheckBox

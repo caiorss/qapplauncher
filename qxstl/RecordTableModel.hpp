@@ -15,6 +15,9 @@
 #include <QApplication>
 #include <QSysInfo>
 
+namespace qxstl::model
+{
+
 /**
  *
  *  Note: References that helped implementing this class.
@@ -92,7 +95,7 @@ public:
     TItem& at(int n)
     {
         return m_dataset.at(n);
-    }        
+    }
 
     // Return begin iterator
     auto begin() { return m_dataset.begin(); }
@@ -203,9 +206,11 @@ public:
 
 
 private:
-    std::deque<TItem>         m_dataset;   
+    std::deque<TItem>         m_dataset;
 
 }; //---- End of class RecordTableModel ---//
 
+
+}
 
 #endif // RECORDTABLEMODEL_HPP

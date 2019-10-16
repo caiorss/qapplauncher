@@ -10,6 +10,8 @@
 #include <cassert>
 #include <string>
 
+namespace qxstl::gui {
+
 /**
   * Class FormLoader is a helper for loading QtWidgets dynamically
   * from a Form without compilation. */
@@ -154,5 +156,7 @@ private:
 
 };
 
+
+}
 
 #endif // FORMLOADER_HPP

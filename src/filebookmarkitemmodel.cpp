@@ -5,7 +5,7 @@ FileBookmarkItemModel::FileBookmarkItemModel()
 }
 
 FileBookmarkItemModel::FileBookmarkItemModel(QWidget* parent)
-    : RecordTableModel<FileBookmarkItem>(parent)
+    : qxstl::model::RecordTableModel<FileBookmarkItem>(parent)
 {
 }
 

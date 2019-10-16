@@ -1,7 +1,9 @@
 #include <iostream>
 
 #include "tab_applicationlauncher.hpp"
-#include <qtutils/qtutils.hpp>
+#include <qxstl/event.hpp>
+
+namespace qx = qxstl::event;
 
 Tab_ApplicationLauncher::Tab_ApplicationLauncher(
       QWidget* parent
@@ -60,7 +62,7 @@ Tab_ApplicationLauncher::Tab_ApplicationLauncher(
     loader->on_button_clicked("btn_run", this
                               , &Tab_ApplicationLauncher::run_combobox_command) ;
 
-    qtutils::set_shortcut(cmd_input, Qt::Key_Return,
+    qx::set_shortcut(cmd_input, Qt::Key_Return,
                           std::bind(&Tab_ApplicationLauncher::run_combobox_command, this));
 
 

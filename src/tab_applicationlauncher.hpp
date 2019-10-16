@@ -1,11 +1,11 @@
 #ifndef TAB_APPLICATIONLAUNCHER_HPP
 #define TAB_APPLICATIONLAUNCHER_HPP
 
-#include <qtutils/FormLoader.hpp>
-#include <qtutils/serialization.hpp>
+#include <qxstl/FormLoader.hpp>
+#include <qxstl/serialization.hpp>
 
 
-namespace qtutils::serialization
+namespace qxstl::serialization
 {
     template<>
     inline QVariant value_writer(QListWidget& ref)
@@ -29,8 +29,11 @@ namespace qtutils::serialization
 
 }
 
+using FormLoader = qxstl::gui::FormLoader;
+
 class Tab_ApplicationLauncher
-{
+{    
+
     FormLoader* loader;
     QWidget*    parent;
 

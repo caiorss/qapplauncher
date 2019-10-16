@@ -1,8 +1,8 @@
 #ifndef TAB_DESKTOPBOOKMARKS_HPP
 #define TAB_DESKTOPBOOKMARKS_HPP
 
-#include <qtutils/FormLoader.hpp>
-#include <qtutils/serialization.hpp>
+#include <qxstl/FormLoader.hpp>
+#include <qxstl/serialization.hpp>
 
 #include "filebookmarkitemmodel.hpp"
 
@@ -10,7 +10,7 @@
 #include <QtCore>
 #include <QWidget>
 
-namespace qtutils::serialization
+namespace qxstl::serialization
 {
 template<>
 inline QVariant value_writer(FileBookmarkItemModel& ref)
@@ -50,6 +50,7 @@ inline void value_reader(FileBookmarkItemModel& ref, QVariant value)
 
 }
 
+using qxstl::gui::FormLoader;
 
 class Tab_DesktopBookmarks
 {

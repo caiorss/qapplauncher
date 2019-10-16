@@ -1,5 +1,7 @@
-#include <qtutils/serialization.hpp>
+#include <qxstl/serialization.hpp>
 #include "appmainwindow.hpp"
+
+namespace qx = qxstl::event;
 
 AppMainWindow::AppMainWindow()
     : loader{FormLoader(this, ":/assets/user_interface.ui")}
@@ -16,14 +18,14 @@ AppMainWindow::AppMainWindow()
 
     //===== Set up User Interface Theme =================//
 
-    qtutils::set_app_dark_style();
+    qx::set_app_dark_style();
 
     //========= Create Tray Icon =======================//
 
     // Do not quit when user clicks at close button
     this->setAttribute(Qt::WA_QuitOnClose, false);
 
-    tray_icon = qtutils::make_window_toggle_trayicon(
+    tray_icon = qx::make_window_toggle_trayicon(
         this,
         ":/assets/appicon.png"
         , "Tray Icon Test"
@@ -71,9 +73,9 @@ AppMainWindow::AppMainWindow()
     loader.on_src_clicked<QCheckBox>("chb_dark_theme", [](QCheckBox* sender)
                                      {
                                          if(sender->isChecked())
-                                             qtutils::set_app_dark_style();
+                                             qx::set_app_dark_style();
                                          else
-                                             qtutils::set_app_default_style();
+                                             qx::set_app_default_style();
                                      });
 
     loader.on_button_clicked(
@@ -82,7 +84,7 @@ AppMainWindow::AppMainWindow()
             QString desktop_path =
                 QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)[0];
 
-            qtutils::create_linux_desktop_shortcut(
+            qx::create_linux_desktop_shortcut(
                 desktop_path
                 , ":/assets/appicon.png"
                 , "Application for bookmarking files, directories and applications"
@@ -186,7 +188,7 @@ AppMainWindow::load_settings()
     // Abort if setting files does not exist
     if(!QFile(settings_file).exists()){ return; }
 
-    qtutils::serialization::FileReader reader(settings_file);
+    qxstl::serialization::FileReader reader(settings_file);
     reader(*tab_applauncher);
     reader(*tab_deskbookmarks);
 
@@ -201,7 +203,7 @@ void AppMainWindow::save_settings()
 
     auto settings_file = this->get_settings_file();
 
-    qtutils::serialization::FileWriter writer(settings_file);
+    qxstl::serialization::FileWriter writer(settings_file);
     writer(*tab_applauncher);
     writer(*tab_deskbookmarks);
     std::cout << " [INFO] END Settings saved OK" << std::endl;
