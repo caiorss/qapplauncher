@@ -7,7 +7,8 @@ release:
 	cmake --build _build --target
 
 clean:
-	rm -rfv ./_build ./bin 
+	rm -rfv ./_build ./bin/*
 
-test:
-	python3 test_script.py
+# Run: make debug or make release and then make run. 
+run:
+	bin/applauncher 
